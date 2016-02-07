@@ -45,32 +45,43 @@ span#some-id.classname
 #amazing-div some-attr="hello"
 ```
 
-compiles to ECR:
+Given the context:
+
+```crystal
+some_var = "hello"
+strings = ["ah", "oh"]
+```
+
+Compiles to HTML:
 
 ```html
 <span id="some-id" class="classname">
   <div id="hello" class="world world2">
-    <span data-some-var="<%= some_var %>">
+    <span data-some-var="hello">
       <span>
         <span class="deep_nested">
-          <%= Process.pid %>
-          <%= "text node" %>
-          <%= "other text node syntax" %>
+          12766
+          text node
+          other text node
         </span>
       </span>
     </span>
-    <span class="alongside" pid="<%= Process.pid %>">
-      <custom-tag id="with-id" pid="<%= "#{Process.pid}" %>">
-        <% strings.each do |s| %>
+    <span class="alongside" pid="12766">
+      <custom-tag id="with-id" pid="12766">
+
           <span>
-            <%= s %>
+            ah
           </span>
-        <% end %>
+
+          <span>
+            oh
+          </span>
+
       </custom-tag>
     </span>
   </div>
 </span>
-<div id="amazing-div" some-attr="<%= "hello" %>"></div>
+<div id="amazing-div" some-attr="hello"></div>
 ```
 
 ## Roadmap

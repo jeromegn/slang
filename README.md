@@ -4,7 +4,7 @@ Very much inspired by [slim](https://github.com/slim-template/slim), this is a t
 
 ## Status
 
-**ALPHA** -> No tests, no real-world usage, just playing with creating a nice parser/lexer that gives us slim-like templating capabilities.
+**Developer Preview**: Barely any tests, no real-world usage, just playing with creating a nice parser/lexer that gives us slim-like templating capabilities.
 
 ## Installation
 
@@ -18,37 +18,31 @@ dependencies:
 
 ## Usage
 
-### Known issue: macros don't work as-is.
+### Rendering some slang to HTML
 
-This does not work out of the box currently. There are known issues with the macros that prevent this from running correctly.
+```crystal
+String.build do |str|
+  embed_slang("path/to/file.slang", "str")
+end
+```
 
-Given the issue, here's a manual workaround:
+### With frameworks...
 
 ```crystal
 macro render_slang(filename)
   String.build do |__view__|
-    \{{ run("../libs/slang/slang/process", "views/{{filename.id}}.slang", "__view__") }}
+    embed_slang "views/{{filename.id}}.slang", "__view__"
   end
 end
 
 render_slang :hello # will check for views/hello.slang and render it.
 ```
 
-That works with [Kemal](http://kemalcr.com) like:
+Example with [Kemal](http://kemalcr.com):
 
 ```crystal
 get "/" do
   render_slang :hello
-end
-```
-
-### Rendering some slang to HTML
-
-**Does not currently work, see above not in "Known issues".**
-
-```crystal
-String.build do |str|
-  embed_slang("path/to/file.slang", "str")
 end
 ```
 
@@ -94,15 +88,12 @@ Compiles to HTML:
     </span>
     <span class="alongside" pid="12766">
       <custom-tag id="with-id" pid="12766">
-
-          <span>
-            ah
-          </span>
-
-          <span>
-            oh
-          </span>
-
+        <span>
+          ah
+        </span>
+        <span>
+          oh
+        </span>
       </custom-tag>
     </span>
   </div>

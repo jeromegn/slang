@@ -18,11 +18,27 @@ dependencies:
 
 ## Usage
 
-### Known issue: macros don't work.
+### Known issue: macros don't work as-is.
 
 This does not work out of the box currently. There are known issues with the macros that prevent this from running correctly.
 
+### Usage with [Kemal](http://kemalcr.com)
+
+Given the known issues, you'll have to create your own macro like:
+
+```crystal
+macro render_slang(filename)
+  String.build do |__view__|
+    \{{ run("../libs/slang/slang/process", "views/{{filename.id}}.slang", "__view__") }}
+  end
+end
+
+render_slang :hello # will check for views/hello.slang and render it.
+```
+
 ### Rendering some slang to HTML
+
+**Does not currently work, see above not in "Known issues".**
 
 ```crystal
 String.build do |str|
@@ -93,7 +109,6 @@ Compiles to HTML:
 - [ ] Documentation
 - [ ] Tests
 - [x] No need to rely on ECR probably, but that's optimization at this point
-- [ ] Support "inline"
 
 ## Contributing
 

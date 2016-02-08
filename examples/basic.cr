@@ -1,4 +1,4 @@
-require "slang"
+require "../src/slang"
 
 some_var = "hello"
 strings = ["ah", "oh"]

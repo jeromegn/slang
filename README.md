@@ -18,6 +18,10 @@ dependencies:
 
 ## Usage
 
+### Known issue: macros don't work.
+
+This does not work out of the box currently. There are known issues with the macros that prevent this from running correctly.
+
 ### Rendering some slang to HTML
 
 ```crystal

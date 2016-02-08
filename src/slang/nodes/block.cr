@@ -7,14 +7,18 @@ module Slang
       def initialize(@parent, @value, @column_number = 1)
       end
 
-      def to_ecr
-        String.build do |str|
-          indentation_spaces.times {|n| str << " " }
-          str << "<% #{value} %>"
-          str << "\n#{super}" if children?
-          indentation_spaces.times {|n| str << " " }
-          str << "<% end %>"
+      def to_s(str, buffer_name)
+        str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
+        str << "#{value}\n"
+        str << "#{buffer_name} << \"\n\"\n"
+        if children?
+          # str << "#{buffer_name} << \"\n\"\n"
+          nodes.each do |node|
+            node.to_s(str, buffer_name)
+          end
         end
+        str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
+        str << "end\n"
       end
 
     end

@@ -1,6 +1,5 @@
 module Slang
   class Document < Node
-
     def column_number
       1
     end
@@ -8,6 +7,5 @@ module Slang
     def parent
       self
     end
-
   end
 end

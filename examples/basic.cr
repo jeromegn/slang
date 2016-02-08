@@ -1,12 +1,10 @@
-require "../src/slang"
+require "slang"
 
 some_var = "hello"
 strings = ["ah", "oh"]
 
-res = String.build do |str|
-  embed_slang("#{__DIR__}/./basic.slang", "str")
+res = String.build do |__slang__|
+  embed_slang("basic.slang", "__slang__")
 end
-
-# res = Slang::Parser.new(File.read("#{__DIR__}/./basic.slang")).parse
 
 puts res

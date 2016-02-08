@@ -25,25 +25,34 @@ module Slang
         @class_names
       end
 
-      def to_ecr
-        String.build do |str|
-          indentation_spaces.times {|n| str << " " }
-          str << "<#{name}"
-          str << " id=\"#{id}\"" if id
-          str << " class=\"#{class_names.join(" ")}\"" if class_names.size > 0
-          attributes.each do |name, value|
-            str << " #{name}"
-            str << "=\"<%= #{value} %>\"" if value
+      def to_s(str, buffer_name)
+        str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
+        str << "#{buffer_name} << \"<#{name}\"\n"
+        str << "#{buffer_name} << \" id=\\\"#{id}\\\"\"\n" if id
+        if class_names.size > 0
+          str << "#{buffer_name} << \" class=\\\"#{class_names.join(" ")}\\\"\"\n"
+        end
+        attributes.each do |name, value|
+          str << "#{buffer_name} << \" #{name}\"\n"
+          if value
+            str << "#{buffer_name} << \"=\\\"\"\n"
+            str << "(#{value}).to_s #{buffer_name}\n"
+            str << "#{buffer_name} << \"\\\"\"\n"
           end
-          str << ">"
-          if children?
-            str << "\n#{super}"
-            indentation_spaces.times {|n| str << " " }
-          end
-          if !self_closing?
-            str << "</#{name}>"
+          # str << "#{buffer_name} << \"=(#{value}).inspect(#{buffer_name})\"\n" if value
+        end
+        str << "#{buffer_name} << \">\"\n"
+        if children?
+          str << "#{buffer_name} << \"\n\"\n"
+          nodes.each do |node|
+            node.to_s(str, buffer_name)
           end
         end
+        if !self_closing?
+          str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
+          str << "#{buffer_name} << \"</#{name}>\"\n"
+        end
+        str << "#{buffer_name} << \"\n\"\n"
       end
 
       def self_closing?

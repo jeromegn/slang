@@ -1,6 +1,6 @@
 # Slang
 
-Very much inspired by [slim](https://github.com/slim-template/slim), this is a templating language which converts to ECR (embedded crystal) and then to HTML.
+Very much inspired by [slim](https://github.com/slim-template/slim), this is a templating language which outputs HTML.
 
 ## Status
 
@@ -18,7 +18,7 @@ dependencies:
 
 ## Usage
 
-### Render a file
+### Rendering some slang to HTML
 
 ```crystal
 String.build do |str|
@@ -87,9 +87,9 @@ Compiles to HTML:
 ## Roadmap
 
 - [ ] Documentation
-- [ ] No need to rely on ECR probably, but that's optimization at this point
+- [ ] Tests
+- [x] No need to rely on ECR probably, but that's optimization at this point
 - [ ] Support "inline"
-- [ ] More robust lexer for detecting start and end of code to evaluate (well, for ECR to evaluate)
 
 ## Contributing
 

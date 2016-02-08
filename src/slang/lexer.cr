@@ -36,7 +36,7 @@ module Slang
       else
         consume_text
       end
-      p @token
+      @token
     end
 
     private def consume_element
@@ -65,7 +65,7 @@ module Slang
       loop do
         case current_char
         when .alpha?, '-', '_'
-          n, v = p consume_element_attribute
+          n, v = consume_element_attribute
           @token.element_attributes[n] = v
         when ' '
           next_char

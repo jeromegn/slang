@@ -22,9 +22,7 @@ dependencies:
 
 This does not work out of the box currently. There are known issues with the macros that prevent this from running correctly.
 
-### Usage with [Kemal](http://kemalcr.com)
-
-Given the known issues, you'll have to create your own macro like:
+Given the issue, here's a manual workaround:
 
 ```crystal
 macro render_slang(filename)
@@ -34,6 +32,14 @@ macro render_slang(filename)
 end
 
 render_slang :hello # will check for views/hello.slang and render it.
+```
+
+That works with [Kemal](http://kemalcr.com) like:
+
+```crystal
+get "/" do
+  render_slang :hello
+end
 ```
 
 ### Rendering some slang to HTML

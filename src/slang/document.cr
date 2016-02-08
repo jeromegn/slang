@@ -4,6 +4,10 @@ module Slang
       1
     end
 
+    def document?
+      true
+    end
+
     def parent
       self
     end

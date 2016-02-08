@@ -8,7 +8,7 @@ module Slang
       getter :name, :id, :class_names, :attributes
       getter :parent, :column_number
       def initialize(
-        @parent,
+        @parent : Node,
         @name = "div",
         @id = nil,
         @class_names = Set(String).new,
@@ -26,6 +26,7 @@ module Slang
       end
 
       def to_s(str, buffer_name)
+        str << "#{buffer_name} << \"\n\"\n"
         str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
         str << "#{buffer_name} << \"<#{name}\"\n"
         str << "#{buffer_name} << \" id=\\\"#{id}\\\"\"\n" if id
@@ -39,20 +40,18 @@ module Slang
             str << "(#{value}).to_s #{buffer_name}\n"
             str << "#{buffer_name} << \"\\\"\"\n"
           end
-          # str << "#{buffer_name} << \"=(#{value}).inspect(#{buffer_name})\"\n" if value
         end
         str << "#{buffer_name} << \">\"\n"
         if children?
-          str << "#{buffer_name} << \"\n\"\n"
           nodes.each do |node|
             node.to_s(str, buffer_name)
           end
         end
         if !self_closing?
+          str << "#{buffer_name} << \"\n\"\n"
           str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
           str << "#{buffer_name} << \"</#{name}>\"\n"
         end
-        str << "#{buffer_name} << \"\n\"\n"
       end
 
       def self_closing?

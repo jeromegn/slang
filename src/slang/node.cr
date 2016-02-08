@@ -9,8 +9,23 @@ module Slang
       nodes.size > 0
     end
 
+    def document?
+      false
+    end
+
     def indentation_spaces
-      [column_number, 1].max - 1
+      if column_number == 1
+        0
+      else
+        control_depth = 0
+        current_parent = parent
+        # de-indent blocks
+        until current_parent.is_a?(Document)
+          control_depth += 1 if current_parent.class.name.ends_with?("Control")
+          current_parent = current_parent.not_nil!.parent.not_nil!
+        end
+        [(column_number - (control_depth * 2)), 1].max - 1
+      end
     end
 
     def indent?

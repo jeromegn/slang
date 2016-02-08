@@ -32,7 +32,7 @@ module Slang
       when '.', '#', .alpha?
         consume_element
       when '-'
-        consume_block
+        consume_control
       else
         consume_text
       end
@@ -81,6 +81,11 @@ module Slang
 
     private def consume_element_name
       @token.element_name = consume_html_valid_name
+      if @token.element_name == "doctype"
+        @token.type = :DOCTYPE
+        next_char if current_char == ' '
+        @token.value = consume_line
+      end
     end
 
     private def consume_element_class
@@ -109,11 +114,11 @@ module Slang
       end
     end
 
-    private def consume_block
-      @token.type = :BLOCK
+    private def consume_control
+      @token.type = :CONTROL
       next_char
       next_char if current_char == ' '
-      @token.value = consume_value(false)
+      @token.value = consume_line
     end
 
     private def consume_text
@@ -126,6 +131,19 @@ module Slang
         next_char if current_char == '|' || current_char == '\''
         next_char if current_char == ' '
         @token.value = "\"#{consume_value(false)}\""
+      end
+    end
+
+    private def consume_line
+      String.build do |str|
+        loop do
+          if current_char == '\n' || current_char == '\0'
+            break
+          else
+            str << current_char
+            next_char
+          end
+        end
       end
     end
 

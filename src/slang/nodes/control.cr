@@ -1,6 +1,6 @@
 module Slang
   module Nodes
-    class Text < Node
+    class Control < Node
 
       getter :value, :parent, :column_number
 
@@ -8,9 +8,13 @@ module Slang
       end
 
       def to_s(str, buffer_name)
-        str << "#{buffer_name} << \"\n\"\n"
-        str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
-        str << "#{buffer_name} << (#{value}).to_s(#{buffer_name})\n"
+        str << "#{value}\n"
+        if children?
+          nodes.each do |node|
+            node.to_s(str, buffer_name)
+          end
+          str << "end\n"
+        end
       end
 
     end

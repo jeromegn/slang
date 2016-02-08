@@ -17,11 +17,14 @@ module Slang
             break
           when :NEWLINE
             next_token
-          when :ELEMENT, :TEXT, :BLOCK
-            parent = @current_node
+          when :DOCTYPE
+            document.nodes << Nodes::Doctype.new(document, token.value)
+            next_token
+          when :ELEMENT, :TEXT, :CONTROL
+            parent = @current_node.not_nil!
             until parent.is_a?(Document)
               break if parent.not_nil!.column_number < token.column_number
-              parent = parent.not_nil!.parent
+              parent = parent.not_nil!.parent.not_nil!
             end
 
             node = case token.type
@@ -32,8 +35,8 @@ module Slang
                 column_number: token.column_number,
                 attributes: token.element_attributes
               )
-            when :BLOCK
-              Nodes::Block.new(parent, token.value, column_number: token.column_number)
+            when :CONTROL
+              Nodes::Control.new(parent, token.value, column_number: token.column_number)
             else
               Nodes::Text.new(parent, token.value, column_number: token.column_number)
             end

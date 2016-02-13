@@ -33,7 +33,8 @@ module Slang
                 class_names: token.element_class_names,
                 id: token.element_id,
                 column_number: token.column_number,
-                attributes: token.element_attributes
+                attributes: token.element_attributes,
+                value: token.value
               )
             when :CONTROL
               Nodes::Control.new(parent, token.value, column_number: token.column_number)

@@ -53,7 +53,9 @@ module Slang
           next_char # skip the . or # at the beginning
           consume_element_id
         when ' '
+          skip_whitespace
           consume_element_attributes
+          # consume_element_content
         else
           break
         end
@@ -65,18 +67,17 @@ module Slang
       loop do
         case current_char
         when .alpha?, '-', '_'
-          n, v = consume_element_attribute
-          @token.element_attributes[n] = v
-        when ' '
-          next_char
+          attr_name = consume_html_valid_name
+          if current_char == '='
+            @token.element_attributes[attr_name] = consume_value
+          else
+            @token.value = "#{attr_name}#{consume_line}"
+            break
+          end
         else
           break
         end
       end
-    end
-
-    private def consume_element_attribute
-      { consume_html_valid_name, consume_value }
     end
 
     private def consume_element_name

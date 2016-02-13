@@ -2,10 +2,6 @@
 
 Very much inspired by [slim](https://github.com/slim-template/slim), this is a templating language which outputs HTML.
 
-## Status
-
-**Developer Preview**: Barely any tests, no real-world usage, just playing with creating a nice parser/lexer that gives us slim-like templating capabilities.
-
 ## Installation
 
 Add this to your application's `shard.yml`:
@@ -49,20 +45,28 @@ end
 ## Syntax
 
 ```slim
-span#some-id.classname
-  #hello.world.world2
-    span data-some-var=some_var
-      span
-        span.deep_nested
-          = Process.pid
-          | text node
-          ' other text node syntax
-    span.alongside pid=Process.pid
-      custom-tag#with-id pid="#{Process.pid}"
-        - strings.each do |s|
+doctype html
+html
+  head
+    title This is a title
+  body
+    span#some-id.classname
+      #hello.world.world2
+        - some_var = "hello world haha"
+        span
+          span data-some-var=some_var two-attr="fun" and a value
           span
-            = s
-#amazing-div some-attr="hello"
+            span.deep_nested
+              = Process.pid
+              | text node
+              ' other text node
+        span.alongside pid=Process.pid
+          custom-tag#with-id pid="#{Process.pid}"
+            - ["ah", "oh"].each do |s|
+              span
+                = s
+
+    #amazing-div some-attr="hello"
 ```
 
 Given the context:
@@ -75,30 +79,39 @@ strings = ["ah", "oh"]
 Compiles to HTML:
 
 ```html
-<span id="some-id" class="classname">
-  <div id="hello" class="world world2">
-    <span data-some-var="hello">
-      <span>
-        <span class="deep_nested">
-          12766
-          text node
-          other text node
-        </span>
-      </span>
-    </span>
-    <span class="alongside" pid="12766">
-      <custom-tag id="with-id" pid="12766">
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>This is a title</title>
+  </head>
+  <body>
+    <span id="some-id" class="classname">
+      <div id="hello" class="world world2">
         <span>
-          ah
+          <span data-some-var="hello world haha" two-attr="fun">and a value</span>
+          <span>
+            <span class="deep_nested">
+              #{Process.pid}
+              text node
+              other text node
+            </span>
+          </span>
         </span>
-        <span>
-          oh
+        <span class="alongside" pid="#{Process.pid}">
+          <custom-tag id="with-id" pid="#{Process.pid}">
+            <span>
+              ah
+            </span>
+            <span>
+              oh
+            </span>
+          </custom-tag>
         </span>
-      </custom-tag>
+      </div>
     </span>
-  </div>
-</span>
-<div id="amazing-div" some-attr="hello"></div>
+    <div id="amazing-div" some-attr="hello"></div>
+  </body>
+</html>
 ```
 
 ## Roadmap

@@ -5,7 +5,7 @@ module Slang
       SELF_CLOSING_TAGS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"]
       RAW_TEXT_TAGS = ["script", "style"]
 
-      getter :name, :id, :class_names, :attributes
+      getter :name, :id, :class_names, :attributes, :value
       getter :parent, :column_number
       def initialize(
         @parent : Node,
@@ -13,7 +13,8 @@ module Slang
         @id = nil,
         @class_names = Set(String).new,
         @column_number = 1,
-        @attributes = {} of String => String
+        @attributes = {} of String => String,
+        @value = ""
       )
         @name ||= "div"
       end
@@ -42,14 +43,18 @@ module Slang
           end
         end
         str << "#{buffer_name} << \">\"\n"
-        if children?
+        if !value && children?
           nodes.each do |node|
             node.to_s(str, buffer_name)
           end
+        else
+          str << "#{buffer_name} << \"#{value}\"\n"
         end
         if !self_closing?
-          str << "#{buffer_name} << \"\n\"\n"
-          str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
+          if children?
+            str << "#{buffer_name} << \"\n\"\n"
+            str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
+          end
           str << "#{buffer_name} << \"</#{name}>\"\n"
         end
       end

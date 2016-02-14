@@ -19,7 +19,7 @@ module Slang
           when :DOCTYPE
             document.nodes << Nodes::Doctype.new(document, token)
             next_token
-          when :ELEMENT, :TEXT, :CONTROL, :OUTPUT
+          when :ELEMENT, :TEXT, :HTML, :COMMENT, :CONTROL, :OUTPUT
             parent = @current_node.not_nil!
             until parent.is_a?(Document)
               break if parent.not_nil!.column_number < token.column_number
@@ -31,14 +31,14 @@ module Slang
               Nodes::Element.new(parent, token)
             when :CONTROL
               Nodes::Control.new(parent, token)
+            when :COMMENT
+              Nodes::Comment.new(parent, token)
             else
               Nodes::Text.new(parent, token)
             end
             parent.not_nil!.nodes << node
             @current_node = node
             next_token
-          when :COMMENT
-            # do nothing, for now.
           else
             unexpected_token
           end

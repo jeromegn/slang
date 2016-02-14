@@ -39,10 +39,11 @@ module Slang
         consume_output
       when '|', '\''
         consume_text
+      when '<'
+        consume_html
+        @token.escaped = true if inline
       when '/'
-        @token.type = :COMMENT
-        next_char
-        @token.value = consume_line
+        consume_comment
       else
         if inline
           consume_text
@@ -50,7 +51,7 @@ module Slang
           unexpected_char
         end
       end
-      
+
       @token.inline = inline
       @last_token = @token
       @token
@@ -137,6 +138,36 @@ module Slang
       end
     end
 
+    private def consume_comment
+      @token.type = :COMMENT
+      next_char
+      if current_char == '!'
+        @token.visible = true
+        next_char
+      elsif current_char == '['
+        @token.visible = true
+        next_char
+        @token.conditional = String.build do |str|
+          loop do
+            case current_char
+            when ']'
+              next_char
+              break
+            when '\0', '\n', '\r'
+              break
+            else
+              str << current_char
+              next_char
+            end
+          end
+        end
+      else
+        @token.visible = false
+      end
+      skip_whitespace
+      @token.value = consume_line if @token.conditional.empty?
+    end
+
     private def consume_control
       @token.type = :CONTROL
       next_char
@@ -146,11 +177,26 @@ module Slang
 
     private def consume_output
       @token.type = :OUTPUT
+      append_whitespace = false
+      prepend_whitespace = false
       next_char
-      @token.escaped = current_char != '='
-      next_char unless @token.escaped
+      if current_char == '='
+        @token.escaped = false
+        next_char
+      end
+      if current_char == '<'
+        prepend_whitespace = true
+        next_char
+      end
+      if current_char == '>'
+        append_whitespace = true
+        next_char
+      end
+
       skip_whitespace
       @token.value = consume_line.strip
+      @token.value = " #{@token.value}" if prepend_whitespace
+      @token.value = "#{@token.value} " if append_whitespace
     end
 
     private def consume_text
@@ -159,6 +205,12 @@ module Slang
       next_char if current_char == '|' || current_char == '\''
       skip_whitespace
       @token.value = "\"#{consume_line.strip}#{append_whitespace ? " " : ""}\""
+    end
+
+    private def consume_html
+      @token.type = :HTML
+      @token.escaped = false
+      @token.value = "\"#{consume_line}\""
     end
 
     private def consume_line

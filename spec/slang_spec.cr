@@ -12,6 +12,12 @@ describe Slang do
         <title>This is a title</title>
       </head>
       <body>
+        <!--Multi-line comment
+          <span>this is wrapped in a comment</span>
+        -->
+        <!--[if IE]>
+          <p>Dat browser is old.</p>
+        <![endif]-->
         <span id="some-id" class="classname">
           <div id="hello" class="world world2">
             <span>
@@ -33,6 +39,7 @@ describe Slang do
           </div>
         </span>
         <div id="amazing-div" some-attr="hello"></div>
+        <!--This is a visible comment-->
       </body>
     </html>
     HTML
@@ -51,13 +58,6 @@ describe Slang do
       <span attr="hello world"></span>
       HTML
     end
-
-    # it "accepts spaces in attributes with control" do
-    #   render("span attr=(p \"hello\")").should eq <<-HTML
-      
-    #   <span attr="hello"></span>
-    #   HTML
-    # end
 
   end
 
@@ -88,6 +88,20 @@ describe Slang do
     it "does not escapes html with ==" do
       render("div == \"<ah>\"").should eq <<-HTML
       <div><ah></div>
+      HTML
+    end
+
+  end
+
+  describe "raw html" do
+
+    it "renders html" do
+      res = render_file "spec/fixtures/with_html.slang"
+
+      res.should eq <<-HTML
+      <table>
+        <tr><td>#{Process.pid}</td></tr>
+      </table>
       HTML
     end
 

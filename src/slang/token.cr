@@ -10,7 +10,7 @@ module Slang
              :attributes,
              :id
 
-    property :value, :escaped, :inline
+    property :value, :escaped, :inline, :visible, :conditional
 
     def initialize
       @type = :EOF
@@ -21,6 +21,8 @@ module Slang
       @attributes = {} of String => String
       @escaped = true
       @inline = false
+      @visible = true
+      @conditional = ""
     end
 
     # def to_s(io)

@@ -73,6 +73,24 @@ describe Slang do
       HTML
     end
 
+    it "escapes html" do
+      render("div <ah>").should eq <<-HTML
+      <div>&lt;ah&gt;</div>
+      HTML
+    end
+
+    it "escapes html with =" do
+      render("div = \"<ah>\"").should eq <<-HTML
+      <div>&lt;ah&gt;</div>
+      HTML
+    end
+
+    it "does not escapes html with ==" do
+      render("div == \"<ah>\"").should eq <<-HTML
+      <div><ah></div>
+      HTML
+    end
+
   end
 
 end

@@ -1,3 +1,4 @@
+require "html"
 require "./slang/version"
 require "./slang/node"
 require "./slang/document"

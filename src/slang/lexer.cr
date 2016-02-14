@@ -20,36 +20,37 @@ module Slang
 
       inline = @last_token.type == :ELEMENT && @last_token.line_number == @line_number
 
-      if current_char.alphanumeric? && inline
-        consume_text
-      else
-        case current_char
-        when '\0'
-          @token.type = :EOF
-        when '\r'
-          if next_char == '\n'
-            consume_newline
-          else
-            raise "expected '\\n' after '\\r'"
-          end
-        when '\n'
+      case current_char
+      when '\0'
+        @token.type = :EOF
+      when '\r'
+        if next_char == '\n'
           consume_newline
-        when '.', '#', .alpha?
-          consume_element
-        when '-'
-          consume_control
-        when '='
-          consume_output
-        when '|', '\''
+        else
+          raise "expected '\\n' after '\\r'"
+        end
+      when '\n'
+        consume_newline
+      when '.', '#', .alpha?
+        inline ? consume_text : consume_element
+      when '-'
+        inline ? consume_text : consume_control
+      when '='
+        consume_output
+      when '|', '\''
+        consume_text
+      when '/'
+        @token.type = :COMMENT
+        next_char
+        @token.value = consume_line
+      else
+        if inline
           consume_text
-        when '/'
-          @token.type = :COMMENT
-          next_char
-          @token.value = consume_line
         else
           unexpected_char
         end
       end
+      
       @token.inline = inline
       @last_token = @token
       @token

@@ -55,7 +55,6 @@ module Slang
         when ' '
           skip_whitespace
           consume_element_attributes
-          # consume_element_content
         else
           break
         end
@@ -151,30 +150,50 @@ module Slang
     CLOSE_OPEN_MAP = {
       '}' => '{',
       ']' => '[',
-      ')' => '('
+      ')' => '(',
+      '"' => '"'
     }
 
     private def consume_value(end_on_space = true)
       String.build do |str|
-        opened_controls = {} of Char => Int32
+        # opened_controls = {} of Char => Int32
+        is_str = false
+        is_in_parenthesis = false
         loop do
           case current_char
           when '='
             next_char
-          when '[', '{', '(' # opening control
-            opened_controls[current_char] ||= 0
-            opened_controls[current_char] += 1
-            str << current_char
-            next_char
-          when ']', '}', ')' # closing control
-            open_char = CLOSE_OPEN_MAP[current_char]
-            if opened_controls[open_char]
-              opened_controls[open_char] -= 1
+            if current_char == '"'
+              is_str = true
+              str << current_char
+              next_char
+            elsif current_char == '('
+              is_in_parenthesis = true
+              str << current_char
+              next_char
             end
+          # when '[', '{', '(' # opening control
+          #   opened_controls[current_char] ||= 0
+          #   opened_controls[current_char] += 1
+          #   str << current_char
+          #   next_char
+          # when ']', '}', ')' # closing control
+          #   open_char = CLOSE_OPEN_MAP[current_char]
+          #   if opened_controls[open_char]
+          #     opened_controls[open_char] -= 1
+          #   end
+          #   str << current_char
+          #   next_char
+          when '"'
             str << current_char
             next_char
+            break
+          when ')'
+            str << current_char
+            next_char
+            break if is_in_parenthesis
           when ' '
-            break if end_on_space && opened_controls.all? { |k,v| v == 0 }
+            break if !is_str && !is_in_parenthesis && end_on_space
             str << current_char
             next_char
           when '\n', '\0'

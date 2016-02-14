@@ -1,16 +1,14 @@
 require "spec"
 require "../src/slang"
 
-macro render(filename)
+macro render_file(filename)
   String.build do |__str__|
-    \{{ run("./support/process", {{filename}}, "__str__") }}
+    \{{ run("./support/process_file", {{filename}}, "__str__") }}
   end
 end
 
-# macro render(slang)
-#   puts "render macro"
-#   puts {{slang}}
-#   String.build do |__str__|
-#     \{{ puts Slang.process_string({{slang}}, "dummy.slang", "__str__") }}
-#   end
-# end
+macro render(slang)
+  String.build do |__str__|
+    \{{ run("./support/process", {{slang}}, "__str__") }}
+  end
+end

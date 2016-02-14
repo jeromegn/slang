@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Slang do
   
   it "renders a basic document" do
-    res = render("spec/fixtures/basic.slang")
+    res = render_file("spec/fixtures/basic.slang")
     puts res
     res.should eq <<-HTML
     <!DOCTYPE html>
@@ -20,18 +20,14 @@ describe Slang do
                 <span class="deep_nested">
                   #{Process.pid}
                   text node
-                  other text node
+                  other text node 
                 </span>
               </span>
             </span>
             <span class="alongside" pid="#{Process.pid}">
               <custom-tag id="with-id" pid="#{Process.pid}">
-                <span>
-                  ah
-                </span>
-                <span>
-                  oh
-                </span>
+                <span>ah</span>
+                <span>oh</span>
               </custom-tag>
             </span>
           </div>
@@ -46,14 +42,12 @@ describe Slang do
 
     it "accepts string values" do
       render("span attr=\"hello\"").should eq <<-HTML
-      
       <span attr="hello"></span>
       HTML
     end
 
     it "accepts spaces in attribute string values" do
       render("span attr=\"hello world\"").should eq <<-HTML
-      
       <span attr="hello world"></span>
       HTML
     end
@@ -64,6 +58,20 @@ describe Slang do
     #   <span attr="hello"></span>
     #   HTML
     # end
+
+  end
+
+  describe "output" do
+
+    it "accepts spaces in attribute string values" do
+      res = render_file "spec/fixtures/output.slang"
+
+      res.should eq <<-HTML
+      <div>
+        hello
+      </div>
+      HTML
+    end
 
   end
 

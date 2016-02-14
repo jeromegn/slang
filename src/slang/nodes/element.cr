@@ -5,34 +5,24 @@ module Slang
       SELF_CLOSING_TAGS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"]
       RAW_TEXT_TAGS = ["script", "style"]
 
-      getter :name, :id, :class_names, :attributes, :value
-      getter :parent, :column_number
-      def initialize(
-        @parent : Node,
-        @name = "div",
-        @id = nil,
-        @class_names = Set(String).new,
-        @column_number = 1,
-        @attributes = {} of String => String,
-        @value = ""
-      )
-        @name ||= "div"
-      end
+      delegate :name, :id, :class_names, :attributes, @token
 
-      def class_names
+      def generate_class_names
+        names = class_names.dup
         if class_attribute = attributes.delete("class")
-          class_attribute.split(" ").each { |cn| @class_names << cn }
+          class_attribute.split(" ").each { |cn| names << cn }
         end
-        @class_names
+        names
       end
 
       def to_s(str, buffer_name)
-        str << "#{buffer_name} << \"\n\"\n"
+        str << "#{buffer_name} << \"\n\"\n" unless str.empty?
         str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
         str << "#{buffer_name} << \"<#{name}\"\n"
         str << "#{buffer_name} << \" id=\\\"#{id}\\\"\"\n" if id
-        if class_names.size > 0
-          str << "#{buffer_name} << \" class=\\\"#{class_names.join(" ")}\\\"\"\n"
+        c_names = generate_class_names
+        if c_names.size > 0
+          str << "#{buffer_name} << \" class=\\\"#{c_names.join(" ")}\\\"\"\n"
         end
         attributes.each do |name, value|
           str << "#{buffer_name} << \" #{name}\"\n"
@@ -43,20 +33,22 @@ module Slang
           end
         end
         str << "#{buffer_name} << \">\"\n"
-        if !value && children?
+        if children?
           nodes.each do |node|
             node.to_s(str, buffer_name)
           end
-        else
-          str << "#{buffer_name} << \"#{value}\"\n"
         end
         if !self_closing?
-          if children?
+          if children? && !only_inline_children?
             str << "#{buffer_name} << \"\n\"\n"
             str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
           end
           str << "#{buffer_name} << \"</#{name}>\"\n"
         end
+      end
+
+      def only_inline_children?
+        nodes.all? {|n| n.inline }
       end
 
       def self_closing?

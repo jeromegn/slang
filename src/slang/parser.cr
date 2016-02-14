@@ -1,13 +1,12 @@
 module Slang
   class Parser
-    DEFAULT_BUFFER_NAME = "__slang__"
 
     def initialize(string)
       @lexer = Lexer.new(string)
       next_token
     end
 
-    def parse(io_name = DEFAULT_BUFFER_NAME)
+    def parse(io_name = Slang::DEFAULT_BUFFER_NAME)
       document = Document.new
       @current_node = document
       String.build do |str|
@@ -18,9 +17,9 @@ module Slang
           when :NEWLINE
             next_token
           when :DOCTYPE
-            document.nodes << Nodes::Doctype.new(document, token.value)
+            document.nodes << Nodes::Doctype.new(document, token)
             next_token
-          when :ELEMENT, :TEXT, :CONTROL
+          when :ELEMENT, :TEXT, :CONTROL, :OUTPUT
             parent = @current_node.not_nil!
             until parent.is_a?(Document)
               break if parent.not_nil!.column_number < token.column_number
@@ -29,21 +28,17 @@ module Slang
 
             node = case token.type
             when :ELEMENT
-              Nodes::Element.new(parent, token.element_name,
-                class_names: token.element_class_names,
-                id: token.element_id,
-                column_number: token.column_number,
-                attributes: token.element_attributes,
-                value: token.value
-              )
+              Nodes::Element.new(parent, token)
             when :CONTROL
-              Nodes::Control.new(parent, token.value, column_number: token.column_number)
+              Nodes::Control.new(parent, token)
             else
-              Nodes::Text.new(parent, token.value, column_number: token.column_number)
+              Nodes::Text.new(parent, token)
             end
             parent.not_nil!.nodes << node
             @current_node = node
             next_token
+          when :COMMENT
+            # do nothing, for now.
           else
             unexpected_token
           end

@@ -8,7 +8,7 @@ module Slang
       @token = Token.new
       @line_number = 1
       @column_number = 1
-      @io = MemoryIO.new
+      @last_token = @token
     end
 
     def next_token
@@ -18,24 +18,40 @@ module Slang
       @token.line_number = @line_number
       @token.column_number = @column_number
 
-      case current_char
-      when '\0'
-        @token.type = :EOF
-      when '\r'
-        if next_char == '\n'
-          consume_newline
-        else
-          raise "expected '\\n' after '\\r'"
-        end
-      when '\n'
-        consume_newline
-      when '.', '#', .alpha?
-        consume_element
-      when '-'
-        consume_control
-      else
+      inline = @last_token.type == :ELEMENT && @last_token.line_number == @line_number
+
+      if current_char.alphanumeric? && inline
         consume_text
+      else
+        case current_char
+        when '\0'
+          @token.type = :EOF
+        when '\r'
+          if next_char == '\n'
+            consume_newline
+          else
+            raise "expected '\\n' after '\\r'"
+          end
+        when '\n'
+          consume_newline
+        when '.', '#', .alpha?
+          consume_element
+        when '-'
+          consume_control
+        when '='
+          consume_output
+        when '|', '\''
+          consume_text
+        when '/'
+          @token.type = :COMMENT
+          next_char
+          @token.value = consume_line
+        else
+          unexpected_char
+        end
       end
+      @token.inline = inline
+      @last_token = @token
       @token
     end
 
@@ -53,8 +69,8 @@ module Slang
           next_char # skip the . or # at the beginning
           consume_element_id
         when ' '
-          skip_whitespace
           consume_element_attributes
+          break
         else
           break
         end
@@ -63,25 +79,31 @@ module Slang
     end
  
     private def consume_element_attributes
+      current_attr_name = ""
+
       loop do
         case current_char
-        when .alpha?, '-', '_'
-          attr_name = consume_html_valid_name
-          if current_char == '='
-            @token.element_attributes[attr_name] = consume_value
-          else
-            @token.value = "#{attr_name}#{consume_line}"
-            break
-          end
+        when .alphanumeric?
+          break unless current_attr_name.empty?
+          current_attr_name = consume_html_valid_name
+        when '='
+          break if current_attr_name.empty?
+          @token.attributes[current_attr_name] = consume_value
+          current_attr_name = ""
+        when ' '
+          break unless current_attr_name.empty?
+          next_char
         else
           break
         end
       end
+
+      go_back(current_attr_name.size)
     end
 
     private def consume_element_name
-      @token.element_name = consume_html_valid_name
-      if @token.element_name == "doctype"
+      @token.name = consume_html_valid_name
+      if @token.name == "doctype"
         @token.type = :DOCTYPE
         next_char if current_char == ' '
         @token.value = consume_line
@@ -89,11 +111,11 @@ module Slang
     end
 
     private def consume_element_class
-      @token.element_class_names << consume_html_valid_name
+      @token.class_names << consume_html_valid_name
     end
 
     private def consume_element_id
-      @token.element_id = consume_html_valid_name
+      @token.id = consume_html_valid_name
     end
 
     private def consume_tag_component
@@ -121,17 +143,21 @@ module Slang
       @token.value = consume_line
     end
 
+    private def consume_output
+      @token.type = :OUTPUT
+      next_char
+      @token.escaped = current_char != '='
+      next_char unless @token.escaped
+      skip_whitespace
+      @token.value = consume_line.strip
+    end
+
     private def consume_text
       @token.type = :TEXT
-      if current_char == '='
-        next_char
-        next_char if current_char == ' '
-        @token.value = consume_value(false)
-      else
-        next_char if current_char == '|' || current_char == '\''
-        next_char if current_char == ' '
-        @token.value = "\"#{consume_value(false)}\""
-      end
+      append_whitespace = current_char == '\''
+      next_char if current_char == '|' || current_char == '\''
+      skip_whitespace
+      @token.value = "\"#{consume_line.strip}#{append_whitespace ? " " : ""}\""
     end
 
     private def consume_line
@@ -147,16 +173,21 @@ module Slang
       end
     end
 
+    # private def consume_multi_line
+    #   String.build do |str|
+    #     loop do
+    #     end
+    #   end
+    # end
+
     CLOSE_OPEN_MAP = {
       '}' => '{',
       ']' => '[',
-      ')' => '(',
-      '"' => '"'
+      ')' => '('
     }
 
     private def consume_value(end_on_space = true)
       String.build do |str|
-        # opened_controls = {} of Char => Int32
         is_str = false
         is_in_parenthesis = false
         loop do
@@ -172,18 +203,6 @@ module Slang
               str << current_char
               next_char
             end
-          # when '[', '{', '(' # opening control
-          #   opened_controls[current_char] ||= 0
-          #   opened_controls[current_char] += 1
-          #   str << current_char
-          #   next_char
-          # when ']', '}', ')' # closing control
-          #   open_char = CLOSE_OPEN_MAP[current_char]
-          #   if opened_controls[open_char]
-          #     opened_controls[open_char] -= 1
-          #   end
-          #   str << current_char
-          #   next_char
           when '"'
             str << current_char
             next_char
@@ -226,6 +245,11 @@ module Slang
       @token.line_number = @line_number
       @token.column_number = @column_number
       @token.type = :NEWLINE
+    end
+
+    private def go_back(n)
+      @column_number -= n
+      @reader.pos -= n
     end
 
     private def next_char

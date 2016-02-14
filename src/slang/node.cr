@@ -1,6 +1,12 @@
 module Slang
   abstract class Node
 
+    getter :parent, :token
+    delegate :value, :column_number, :line_number, :escaped, :inline, @token
+
+    def initialize(@parent : Node, @token : Token)
+    end
+
     def nodes # children
       @nodes ||= [] of Node
     end
@@ -29,7 +35,7 @@ module Slang
     end
 
     def indent?
-      indentation_spaces > 0
+      !token.inline && indentation_spaces > 0
     end
 
     def indentation

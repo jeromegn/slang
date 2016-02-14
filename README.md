@@ -54,7 +54,7 @@ html
       #hello.world.world2
         - some_var = "hello world haha"
         span
-          span data-some-var=some_var two-attr="fun" and a value
+          span data-some-var=some_var two-attr="fun" and a #{p("hello")}
           span
             span.deep_nested
               = Process.pid
@@ -63,8 +63,7 @@ html
         span.alongside pid=Process.pid
           custom-tag#with-id pid="#{Process.pid}"
             - ["ah", "oh"].each do |s|
-              span
-                = s
+              span = s
 
     #amazing-div some-attr="hello"
 ```
@@ -88,23 +87,19 @@ Compiles to HTML:
     <span id="some-id" class="classname">
       <div id="hello" class="world world2">
         <span>
-          <span data-some-var="hello world haha" two-attr="fun">and a value</span>
+          <span data-some-var="hello world haha" two-attr="fun">and a hello</span>
           <span>
             <span class="deep_nested">
               #{Process.pid}
               text node
-              other text node
+              other text node 
             </span>
           </span>
         </span>
         <span class="alongside" pid="#{Process.pid}">
           <custom-tag id="with-id" pid="#{Process.pid}">
-            <span>
-              ah
-            </span>
-            <span>
-              oh
-            </span>
+            <span>ah</span>
+            <span>oh</span>
           </custom-tag>
         </span>
       </div>
@@ -114,10 +109,11 @@ Compiles to HTML:
 </html>
 ```
 
-## Roadmap
+## TODO
 
+- [ ] More tests
+- [ ] Website
 - [ ] Documentation
-- [ ] Tests
 - [x] No need to rely on ECR probably, but that's optimization at this point
 
 ## Contributing

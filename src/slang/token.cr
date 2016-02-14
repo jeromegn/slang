@@ -5,19 +5,22 @@ module Slang
     property :line_number, :column_number
     
     # elements
-    property :element_name,
-             :element_class_names,
-             :element_attributes,
-             :element_id
+    property :name,
+             :class_names,
+             :attributes,
+             :id
 
-    property :value
+    property :value, :escaped, :inline
 
     def initialize
       @type = :EOF
       @line_number = 0
       @column_number = 0
-      @element_class_names = Set(String).new
-      @element_attributes = {} of String => String
+      @name = "div"
+      @class_names = Set(String).new
+      @attributes = {} of String => String
+      @escaped = true
+      @inline = false
     end
 
     # def to_s(io)

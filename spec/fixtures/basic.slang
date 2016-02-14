@@ -16,7 +16,6 @@ html
         span.alongside pid=Process.pid
           custom-tag#with-id pid="#{Process.pid}"
             - ["ah", "oh"].each do |s|
-              span
-                = s
+              span = s
 
     #amazing-div some-attr="hello"

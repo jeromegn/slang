@@ -1,15 +1,14 @@
 module Slang
   class Document < Node
-    def column_number
-      1
+
+    def initialize
+      @token = Token.new
+      @token.column_number = 1
+      @parent = self
     end
 
     def document?
       true
-    end
-
-    def parent
-      self
     end
   end
 end

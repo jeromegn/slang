@@ -5,3 +5,7 @@ authors:
   - Jerome Gravel-Niquet <jeromegn@gmail.com>
 
 license: MIT
+
+dependencies:
+  kilt:
+    github: jeromegn/kilt

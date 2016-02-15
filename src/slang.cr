@@ -1,4 +1,5 @@
 require "html"
+require "kilt"
 require "./slang/version"
 require "./slang/node"
 require "./slang/document"
@@ -22,3 +23,5 @@ module Slang
   end
 
 end
+
+Kilt.register_engine "slang", embed_slang

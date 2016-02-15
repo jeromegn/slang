@@ -4,7 +4,6 @@ describe Slang do
   
   it "renders a basic document" do
     res = render_file("spec/fixtures/basic.slang")
-    puts res
     res.should eq <<-HTML
     <!DOCTYPE html>
     <html>

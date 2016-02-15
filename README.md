@@ -1,6 +1,6 @@
 # Slang [![Build Status](https://travis-ci.org/jeromegn/slang.svg?branch=master)](https://travis-ci.org/jeromegn/slang) [![Dependency Status](https://shards.rocks/badge/github/jeromegn/slang/status.svg)](https://shards.rocks/github/jeromegn/slang) [![devDependency Status](https://shards.rocks/badge/github/jeromegn/slang/dev_status.svg)](https://shards.rocks/github/jeromegn/slang)
 
-Very much inspired by [slim](https://github.com/slim-template/slim), this is a templating language which outputs HTML.
+Lightweight, terse, templating language for Crystal.
 
 ## Installation
 
@@ -14,31 +14,32 @@ dependencies:
 
 ## Usage
 
-### Rendering some slang to HTML
+### Preferred: use Kilt
+
+[Kilt](https://github.com/jeromegn/kilt) is included as a dependency for this project. It should help integrating non-ECR template engines.
+
+```
+require "kilt"
+require "slang"
+
+Kilt.render("path/to/file.slang") #=> <compiled template>
+```
+
+Example with [Kemal](http://kemalcr.com) (includes Kilt):
+
+```crystal
+require "slang"
+
+get "/" do
+  render "path/to/file.slang"
+end
+```
+
+### Without Kilt
 
 ```crystal
 String.build do |str|
-  embed_slang("path/to/file.slang", "str")
-end
-```
-
-### With frameworks...
-
-```crystal
-macro render_slang(filename)
-  String.build do |__view__|
-    embed_slang "views/{{filename.id}}.slang", "__view__"
-  end
-end
-
-render_slang :hello # will check for views/hello.slang and render it.
-```
-
-Example with [Kemal](http://kemalcr.com):
-
-```crystal
-get "/" do
-  render_slang :hello
+  Slang.embed("path/to/file.slang", "str")
 end
 ```
 

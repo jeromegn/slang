@@ -24,4 +24,4 @@ module Slang
 
 end
 
-Kilt.register_engine "slang", embed_slang
+Kilt.register_engine "slang", Slang.embed

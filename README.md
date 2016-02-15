@@ -19,7 +19,6 @@ dependencies:
 [Kilt](https://github.com/jeromegn/kilt) is included as a dependency for this project. It should help integrating non-ECR template engines.
 
 ```
-require "slang"
 require "kilt/slang"
 
 Kilt.render("path/to/file.slang") #=> <compiled template>
@@ -28,7 +27,7 @@ Kilt.render("path/to/file.slang") #=> <compiled template>
 Example with [Kemal](http://kemalcr.com) (includes Kilt):
 
 ```crystal
-require "slang"
+require "kilt/slang"
 
 get "/" do
   render "path/to/file.slang"

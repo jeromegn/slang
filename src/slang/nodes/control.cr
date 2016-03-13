@@ -1,10 +1,10 @@
 module Slang
   module Nodes
     class Control < Node
-
       def branches
         @branches ||= [] of Nodes::Control
       end
+
       def branches?
         !branches.empty?
       end
@@ -12,9 +12,11 @@ module Slang
       def if?
         value.not_nil!.starts_with?("if ")
       end
+
       def else?
         value.not_nil!.match /^else\s{0,}/
       end
+
       def elsif?
         value.not_nil!.starts_with?("elsif ")
       end
@@ -22,9 +24,11 @@ module Slang
       def begin?
         value.not_nil!.match(/^begin\s{0,}/)
       end
+
       def rescue?
         value.not_nil!.match(/^rescue\s{0,}/)
       end
+
       def ensure?
         value.not_nil!.match /^ensure\s{0,}/
       end
@@ -32,6 +36,7 @@ module Slang
       def case?
         value.not_nil!.starts_with?("case ")
       end
+
       def when?
         value.not_nil!.starts_with?("when ")
       end
@@ -39,6 +44,7 @@ module Slang
       def branch?
         else? || elsif? || rescue? || when? || ensure?
       end
+
       def branchable?
         if? || case? || begin?
       end

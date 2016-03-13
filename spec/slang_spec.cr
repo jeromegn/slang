@@ -98,4 +98,49 @@ describe Slang do
       HTML
     end
   end
+
+  describe "if elsif else" do
+    it "renders the correct branches" do
+      res = render_file "spec/fixtures/if-elsif-else.slang"
+
+      res.should eq <<-HTML
+      <div>
+        <span>this guy is nested</span>
+        <span>deeply nested</span>
+        <span>true is just true man</span>
+      </div>
+      HTML
+    end
+  end
+
+  describe "case when" do
+    it "renders the correct branches" do
+      res = render_file "spec/fixtures/case-when.slang"
+
+      res.should eq <<-HTML
+      <div>
+        <span>this guy is nested</span>
+        <span>deeply nested</span>
+        <span>true is just true man</span>
+      </div>
+      HTML
+    end
+  end
+
+  describe "begin rescue" do
+    it "renders the correct branches" do
+      res = render_file "spec/fixtures/begin-rescue.slang"
+
+      res.should eq <<-HTML
+      <div>
+        <span>beginning</span>
+        <span>rescued yup</span>
+        <span>beginning 2</span>
+        <span>rescued IndexError</span>
+        <span>beginning 3</span>
+        <span>nothing to rescue</span>
+      </div>
+      HTML
+    end
+  end
 end

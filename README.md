@@ -109,12 +109,16 @@ Compiles to HTML:
 </html>
 ```
 
+## Known limitations
+
+- Need to escape double quotes ie: `div \"hello\"` -> `<div>&quot;hello&quot;</div>`
+
 ## TODO
 
+- [ ] Fix known limitations
 - [ ] More tests
 - [ ] Website
 - [ ] Documentation
-- [x] No need to rely on ECR probably, but that's optimization at this point
 
 ## Contributing
 

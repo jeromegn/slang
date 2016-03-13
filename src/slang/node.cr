@@ -1,6 +1,5 @@
 module Slang
   abstract class Node
-
     getter :parent, :token
     delegate :value, :column_number, :line_number, :escaped, :inline, @token
 
@@ -47,7 +46,6 @@ module Slang
         node.to_s(str, buffer_name)
       end
     end
-
   end
 end
 

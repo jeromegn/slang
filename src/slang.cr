@@ -6,6 +6,7 @@ require "./slang/lexer"
 require "./slang/parser"
 require "./slang/token"
 require "./slang/macros"
+
 # require "./slang/*"
 
 module Slang
@@ -20,5 +21,4 @@ module Slang
     raise "Slang template: #{filename} doesn't exist." unless File.exists?(filename)
     process_string(File.read(filename), filename, buffer_name)
   end
-
 end

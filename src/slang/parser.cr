@@ -1,6 +1,5 @@
 module Slang
   class Parser
-
     def initialize(string)
       @lexer = Lexer.new(string)
       next_token
@@ -27,15 +26,15 @@ module Slang
             end
 
             node = case token.type
-            when :ELEMENT
-              Nodes::Element.new(parent, token)
-            when :CONTROL
-              Nodes::Control.new(parent, token)
-            when :COMMENT
-              Nodes::Comment.new(parent, token)
-            else
-              Nodes::Text.new(parent, token)
-            end
+                   when :ELEMENT
+                     Nodes::Element.new(parent, token)
+                   when :CONTROL
+                     Nodes::Control.new(parent, token)
+                   when :COMMENT
+                     Nodes::Comment.new(parent, token)
+                   else
+                     Nodes::Text.new(parent, token)
+                   end
             parent.not_nil!.nodes << node
             @current_node = node
             next_token

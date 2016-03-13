@@ -1,7 +1,6 @@
 require "./spec_helper"
 
 describe Slang do
-  
   it "renders a basic document" do
     res = render_file("spec/fixtures/basic.slang")
     res.should eq <<-HTML
@@ -45,7 +44,6 @@ describe Slang do
   end
 
   describe "attributes" do
-
     it "accepts string values" do
       render("span attr=\"hello\"").should eq <<-HTML
       <span attr="hello"></span>
@@ -57,11 +55,9 @@ describe Slang do
       <span attr="hello world"></span>
       HTML
     end
-
   end
 
   describe "output" do
-
     it "accepts spaces in attribute string values" do
       res = render_file "spec/fixtures/output.slang"
 
@@ -89,11 +85,9 @@ describe Slang do
       <div><ah></div>
       HTML
     end
-
   end
 
   describe "raw html" do
-
     it "renders html" do
       res = render_file "spec/fixtures/with_html.slang"
 
@@ -103,7 +97,5 @@ describe Slang do
       </table>
       HTML
     end
-
   end
-
 end

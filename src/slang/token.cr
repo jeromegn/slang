@@ -1,14 +1,12 @@
 module Slang
   class Token
-
     property :type
     property :line_number, :column_number
-    
     # elements
     property :name,
-             :class_names,
-             :attributes,
-             :id
+      :class_names,
+      :attributes,
+      :id
 
     property :value, :escaped, :inline, :visible, :conditional
 

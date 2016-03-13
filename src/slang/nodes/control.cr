@@ -1,7 +1,6 @@
 module Slang
   module Nodes
     class Control < Node
-
       def to_s(str, buffer_name)
         str << "#{value}\n"
         if children?
@@ -11,7 +10,6 @@ module Slang
           str << "end\n"
         end
       end
-
     end
   end
 end

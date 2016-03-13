@@ -12,7 +12,6 @@ module Slang
         end
         str << ".to_s(#{buffer_name})\n"
       end
-
     end
   end
 end

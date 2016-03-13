@@ -1,9 +1,8 @@
 module Slang
   module Nodes
     class Element < Node
-
       SELF_CLOSING_TAGS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"]
-      RAW_TEXT_TAGS = ["script", "style"]
+      RAW_TEXT_TAGS     = ["script", "style"]
 
       delegate :name, :id, :class_names, :attributes, @token
 
@@ -48,13 +47,12 @@ module Slang
       end
 
       def only_inline_children?
-        nodes.all? {|n| n.inline }
+        nodes.all? { |n| n.inline }
       end
 
       def self_closing?
         SELF_CLOSING_TAGS.includes?(name)
       end
-
     end
   end
 end

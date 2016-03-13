@@ -1,6 +1,5 @@
 module Slang
   class Lexer
-
     getter token
 
     def initialize(string)
@@ -77,9 +76,7 @@ module Slang
           break
         end
       end
-
     end
- 
     private def consume_element_attributes
       current_attr_name = ""
 
@@ -236,7 +233,7 @@ module Slang
     CLOSE_OPEN_MAP = {
       '}' => '{',
       ']' => '[',
-      ')' => '('
+      ')' => '(',
     }
 
     private def consume_value(end_on_space = true)
@@ -336,6 +333,5 @@ module Slang
     private def unexpected_char(char = current_char)
       raise "unexpected char '#{char}'"
     end
-
   end
 end

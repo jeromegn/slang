@@ -1,5 +1,4 @@
 module Slang
-
   macro embed(filename, io_name)
     \{{ run("slang/slang/process", {{filename}}, {{io_name.id.stringify}}) }}
   end
@@ -10,5 +9,4 @@ module Slang
       embed_slang {{filename}}, "__slang__"
     end
   end
-
 end

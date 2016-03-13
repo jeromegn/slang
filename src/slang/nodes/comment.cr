@@ -1,7 +1,6 @@
 module Slang
   module Nodes
     class Comment < Node
-
       delegate :conditional, :visible, @token
 
       def to_s(str, buffer_name)
@@ -25,7 +24,6 @@ module Slang
       def conditional?
         !conditional.empty?
       end
-
     end
   end
 end

@@ -201,8 +201,37 @@ module Slang
       append_whitespace = current_char == '\''
       next_char if current_char == '|' || current_char == '\''
       skip_whitespace
-      value = consume_line.strip.gsub '"', "\\\""
-      @token.value = "\"#{value}#{append_whitespace ? " " : ""}\""
+      @token.value = "\"#{consume_text_line.strip}#{append_whitespace ? " " : ""}\""
+    end
+
+    private def consume_text_line
+      maybe_string_interpolation = false
+      inside_string_interpolation = false
+      String.build do |str|
+        loop do
+          if current_char == '#'
+            maybe_string_interpolation = true
+          end
+          if maybe_string_interpolation && current_char == '{'
+            maybe_string_interpolation = false
+            inside_string_interpolation = true
+          end
+          if inside_string_interpolation && current_char == '}'
+            inside_string_interpolation = false
+          end
+          if !inside_string_interpolation && current_char == '"'
+            str << "\\\""
+            next_char
+            next
+          end
+          if current_char == '\n' || current_char == '\0'
+            break
+          else
+            str << current_char
+            next_char
+          end
+        end
+      end
     end
 
     private def consume_html

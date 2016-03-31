@@ -201,7 +201,8 @@ module Slang
       append_whitespace = current_char == '\''
       next_char if current_char == '|' || current_char == '\''
       skip_whitespace
-      @token.value = "\"#{consume_line.strip}#{append_whitespace ? " " : ""}\""
+      value = consume_line.strip.gsub '"', "\\\""
+      @token.value = "\"#{value}#{append_whitespace ? " " : ""}\""
     end
 
     private def consume_html

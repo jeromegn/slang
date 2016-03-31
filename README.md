@@ -92,7 +92,7 @@ Compiles to HTML:
             <span class="deep_nested">
               #{Process.pid}
               text node
-              other text node 
+              other text node
             </span>
           </span>
         </span>
@@ -109,13 +109,9 @@ Compiles to HTML:
 </html>
 ```
 
-## Known limitations
-
-- Need to escape double quotes ie: `div \"hello\"` -> `<div>&quot;hello&quot;</div>`
-
 ## TODO
 
-- [ ] Fix known limitations
+- [x] Fix known limitations
 - [ ] More tests
 - [ ] Website
 - [ ] Documentation

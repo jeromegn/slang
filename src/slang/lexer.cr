@@ -224,10 +224,11 @@ module Slang
             str << consume_string open_char: oc, close_char: cc
             next
           end
-          if current_char == '"'
+          if current_char == '"' || current_char == '\''
+            ch = current_char
             str << current_char
             next_char
-            str << consume_string
+            str << consume_string open_char: ch, close_char: ch
             next
           end
           if current_char == '}'
@@ -259,7 +260,7 @@ module Slang
               next
             end
           else
-            if close_char == '"' && current_char == close_char && !escaped
+            if (close_char == '"' || close_char == '\'') && current_char == close_char && !escaped
               str << current_char
               next_char
               break

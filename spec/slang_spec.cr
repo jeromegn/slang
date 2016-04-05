@@ -154,6 +154,11 @@ describe Slang do
         <span>&quot;hello&quot; world</span>
         <span>&quot;hello&quot; &quot;world&quot;</span>
         <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
       </div>
       HTML
     end

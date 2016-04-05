@@ -3,3 +3,8 @@ div
   span "hello" #{p("world")}
   span "hello" "#{p("world")}"
   span "hello #{p("world")}"
+  span "hello #{p("#{"world"}")}"
+  span "#{%(hello #{"world"})}"
+  span #{%["hello #{"world"}"]}
+  span #{%{"hello #{"world"}"}}
+  span #{%<"hello #{"world"}">}

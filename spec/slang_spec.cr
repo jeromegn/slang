@@ -143,4 +143,25 @@ describe Slang do
       HTML
     end
   end
+
+  describe "text node" do
+    it "properly escapes double quotes" do
+      res = render_file "spec/fixtures/double-quotes.slang"
+
+      res.should eq <<-HTML
+      <div>
+        <span>&quot;hello&quot;</span>
+        <span>&quot;hello&quot; world</span>
+        <span>&quot;hello&quot; &quot;world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello world&quot;</span>
+        <span>&quot;hello&quot; &quot;world&quot;</span>
+      </div>
+      HTML
+    end
+  end
 end

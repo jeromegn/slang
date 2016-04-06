@@ -201,7 +201,109 @@ module Slang
       append_whitespace = current_char == '\''
       next_char if current_char == '|' || current_char == '\''
       skip_whitespace
-      @token.value = "\"#{consume_line.strip}#{append_whitespace ? " " : ""}\""
+      @token.value = "\"#{consume_text_line.strip}#{append_whitespace ? " " : ""}\""
+    end
+
+
+    private def consume_text_line
+      consume_string escape_double_quotes: true
+    end
+
+    private def consume_string_interpolation
+      maybe_string = false
+      String.build do |str|
+        loop do
+          if current_char == '%'
+            maybe_string = true
+          end
+          if maybe_string && STRING_OPEN_CLOSE_CHARS_MAP.has_key? current_char
+            oc = current_char
+            cc = STRING_OPEN_CLOSE_CHARS_MAP[current_char]
+            str << current_char
+            next_char
+            str << consume_string open_char: oc, close_char: cc
+            next
+          end
+          if current_char == '"' || current_char == '\''
+            ch = current_char
+            str << current_char
+            next_char
+            str << consume_string open_char: ch, close_char: ch
+            next
+          end
+          if current_char == '}'
+            str << current_char
+            next_char
+            break
+          end
+
+          if current_char == '\n' || current_char == '\0'
+            break
+          else
+            str << current_char
+            next_char
+          end
+        end
+      end
+    end
+
+    private def consume_string(open_char = '"', close_char = '"', escape_double_quotes = false)
+      level = 0
+      escaped = false
+      maybe_string_interpolation = false
+      String.build do |str|
+        loop do
+          if escape_double_quotes
+            if current_char == '"'
+              str << "\\\""
+              next_char
+              next
+            end
+          else
+            if (close_char == '"' || close_char == '\'') && current_char == close_char && !escaped
+              str << current_char
+              next_char
+              break
+            end
+
+            if current_char == open_char && !escaped
+              level += 1
+            end
+            if current_char == close_char && !escaped
+              if level == 0
+                str << current_char
+                next_char
+                break
+              end
+              level -= 1
+            end
+          end
+
+          if maybe_string_interpolation
+            maybe_string_interpolation = false
+            if current_char == '{'
+              str << consume_string_interpolation
+              next
+            end
+          end
+          if current_char == '#' && !escaped
+            maybe_string_interpolation = true
+          end
+
+          if current_char == '\\' && !escaped
+            escaped = true
+          else
+            escaped = false
+          end
+
+          if current_char == '\n' || current_char == '\0'
+            break
+          else
+            str << current_char
+            next_char
+          end
+        end
+      end
     end
 
     private def consume_html
@@ -234,6 +336,13 @@ module Slang
       '}' => '{',
       ']' => '[',
       ')' => '(',
+    }
+
+    STRING_OPEN_CLOSE_CHARS_MAP = {
+        '(' => ')',
+        '{' => '}',
+        '[' => ']',
+        '<' => '>',
     }
 
     private def consume_value(end_on_space = true)

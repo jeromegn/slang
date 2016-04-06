@@ -1,9 +1,9 @@
 div
   - case "string"
   - when "blah"
-    span \"string\" is \"blah\"
+    span "string" is "blah"
   - when false
-    span \"string\" is false
+    span "string" is false
   - when String
     span this guy is nested
     - if false

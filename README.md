@@ -127,3 +127,4 @@ Compiles to HTML:
 ## Contributors
 
 - [jeromegn](https://github.com/jeromegn) Jerome Gravel-Niquet - creator, maintainer
+- [kRaw1er](https://github.com/kRaw1er) Dmitry Neveshkin

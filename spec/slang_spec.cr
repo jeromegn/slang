@@ -25,7 +25,7 @@ describe Slang do
                 <span class="deep_nested">
                   #{Process.pid}
                   text node
-                  other text node 
+                  other text node
                 </span>
               </span>
             </span>

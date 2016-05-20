@@ -10,6 +10,9 @@ module Slang
 
     property :value, :escaped, :inline, :visible, :conditional
 
+    @value : String?
+    @id : String?
+
     def initialize
       @type = :EOF
       @line_number = 0

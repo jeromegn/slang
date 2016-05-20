@@ -1,5 +1,8 @@
 module Slang
   class Parser
+
+    @current_node : Node
+
     def initialize(string)
       @lexer = Lexer.new(string)
       @document = Document.new

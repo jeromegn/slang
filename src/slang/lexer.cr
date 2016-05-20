@@ -352,6 +352,7 @@ module Slang
         loop do
           case current_char
           when '='
+            str << current_char if is_str
             next_char
             if current_char == '"'
               is_str = true

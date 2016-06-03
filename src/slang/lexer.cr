@@ -325,13 +325,6 @@ module Slang
       end
     end
 
-    # private def consume_multi_line
-    #   String.build do |str|
-    #     loop do
-    #     end
-    #   end
-    # end
-
     CLOSE_OPEN_MAP = {
       '}' => '{',
       ']' => '[',
@@ -339,10 +332,10 @@ module Slang
     }
 
     STRING_OPEN_CLOSE_CHARS_MAP = {
-        '(' => ')',
-        '{' => '}',
-        '[' => ']',
-        '<' => '>',
+      '(' => ')',
+      '{' => '}',
+      '[' => ']',
+      '<' => '>',
     }
 
     private def consume_value(end_on_space = true)

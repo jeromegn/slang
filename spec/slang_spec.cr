@@ -59,8 +59,8 @@ describe Slang do
     
     it "allows dynamic classname" do
       klass = "my-class"
-      render("span class=klass").should eq <<-HTML
-      <span class="my-class"></span>
+      render("span class=klass Foo").should eq <<-HTML
+      <span class="my-class">Foo</span>
       HTML
     end
 

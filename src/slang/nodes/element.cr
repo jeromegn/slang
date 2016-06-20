@@ -4,7 +4,7 @@ module Slang
       SELF_CLOSING_TAGS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"]
       RAW_TEXT_TAGS     = ["script", "style"]
 
-      delegate :name, :id, :attributes, @token
+      delegate :name, :id, :attributes, to: @token
 
       def generate_class_names
         names = attributes.delete("class") as Set

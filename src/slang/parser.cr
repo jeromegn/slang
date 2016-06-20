@@ -72,8 +72,8 @@ module Slang
       end
     end
 
-    private delegate token, @lexer
-    private delegate next_token, @lexer
+    private delegate token, to: @lexer
+    private delegate next_token, to: @lexer
 
     private def unexpected_token
       raise "unexpected token '#{token}'"

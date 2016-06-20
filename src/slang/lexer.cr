@@ -87,7 +87,7 @@ module Slang
           current_attr_name = consume_html_valid_name
         when '='
           break if current_attr_name.empty?
-          @token.attributes[current_attr_name] = consume_value
+          @token.add_attribute current_attr_name, consume_value, true
           current_attr_name = ""
         when ' '
           break unless current_attr_name.empty?
@@ -110,7 +110,7 @@ module Slang
     end
 
     private def consume_element_class
-      @token.class_names << consume_html_valid_name
+      @token.add_attribute "class", consume_html_valid_name, false
     end
 
     private def consume_element_id

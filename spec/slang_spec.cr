@@ -56,6 +56,14 @@ describe Slang do
       <span attr="hello world"></span>
       HTML
     end
+    
+    it "allows dynamic classname" do
+      klass = "my-class"
+      render("span class=klass Foo").should eq <<-HTML
+      <span class="my-class">Foo</span>
+      HTML
+    end
+
   end
 
   describe "output" do

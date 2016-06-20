@@ -4,14 +4,11 @@ module Slang
       SELF_CLOSING_TAGS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"]
       RAW_TEXT_TAGS     = ["script", "style"]
 
-      delegate :name, :id, :class_names, :attributes, @token
+      delegate :name, :id, :attributes, @token
 
       def generate_class_names
-        names = class_names.dup
-        if class_attribute = attributes.delete("class")
-          class_attribute.split(" ").each { |cn| names << cn }
-        end
-        names
+        names = attributes.delete("class") as Set
+        names.join(" ")
       end
 
       def to_s(str, buffer_name)
@@ -20,8 +17,11 @@ module Slang
         str << "#{buffer_name} << \"<#{name}\"\n"
         str << "#{buffer_name} << \" id=\\\"#{id}\\\"\"\n" if id
         c_names = generate_class_names
-        if c_names.size > 0
-          str << "#{buffer_name} << \" class=\\\"#{c_names.join(" ")}\\\"\"\n"
+        if c_names && c_names != ""
+          str << "#{buffer_name} << \" class\"\n"
+          str << "#{buffer_name} << \"=\\\"\"\n"
+          str << "(\"#{c_names}\").to_s #{buffer_name}\n"
+          str << "#{buffer_name} << \"\\\"\"\n"
         end
         attributes.each do |name, value|
           str << "#{buffer_name} << \" #{name}\"\n"

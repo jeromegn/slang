@@ -1,7 +1,7 @@
 module Slang
   abstract class Node
     getter :parent, :token
-    delegate :value, :column_number, :line_number, :escaped, :inline, to: @token
+    delegate :value, :column_number, :line_number, :escaped, :inline, @token
 
     def initialize(@parent : Node, @token : Token)
     end

@@ -1,7 +1,7 @@
 module Slang
   module Nodes
     class Comment < Node
-      delegate :conditional, :visible, to: @token
+      delegate :conditional, :visible, @token
 
       def to_s(str, buffer_name)
         if visible || children?

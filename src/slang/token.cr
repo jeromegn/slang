@@ -26,5 +26,20 @@ module Slang
       @conditional = ""
     end
 
+    # def to_s(io)
+    #   case @type
+    #   when :KEY
+    #     io << @string_value
+    #   when :STRING
+    #     @string_value.inspect(io)
+    #   when :INT
+    #     io << @int_value
+    #   when :FLOAT
+    #     io << @float_value
+    #   else
+    #     io << @type
+    #   end
+    # end
+
   end
 end

@@ -173,4 +173,21 @@ describe Slang do
       HTML
     end
   end
+
+  describe "svg tag" do
+    it "renders tag attributes with colons" do
+      res = render_file "spec/fixtures/svg.slang"
+      res.should eq <<-HTML
+      <div>
+        <svg width="256" height="448" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <defs>
+            <path id=\"shape1\" d=\"M184 144q0 3.25-2.375\"></path>
+            <path id=\"shape2\" d=\"M184 144q0 3.25-2.375\"></path>
+          </defs>
+        </svg>
+      </div>
+      HTML
+    end
+  end
+
 end

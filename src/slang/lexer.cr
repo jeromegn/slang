@@ -125,7 +125,7 @@ module Slang
       String.build do |str|
         loop do
           case current_char
-          when .alphanumeric?, '-', '_'
+          when .alphanumeric?, '-', '_', ':'
             str << current_char
             next_char
           else

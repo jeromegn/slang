@@ -7,7 +7,7 @@ module Slang
       delegate :name, :id, :attributes, to: @token
 
       def generate_class_names
-        names = attributes.delete("class") as Set
+        names = attributes.delete("class").as Set
         names.join(" ")
       end
 

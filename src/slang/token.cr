@@ -28,7 +28,7 @@ module Slang
     def add_attribute(name, value, interpolate)
       if name == "class"
         value = "\#{#{value}}" if interpolate
-        (@attributes["class"] as Set) << value
+        (@attributes["class"].as Set) << value
       else
         @attributes[name] = value
       end

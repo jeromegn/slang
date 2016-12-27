@@ -30,7 +30,7 @@ module Slang
         end
       when '\n'
         consume_newline
-      when '.', '#', .alpha?
+      when '.', '#', .ascii_letter?
         inline ? consume_text : consume_element
       when '-'
         inline ? consume_text : consume_control
@@ -61,7 +61,7 @@ module Slang
 
       loop do
         case current_char
-        when .alpha?
+        when .ascii_letter?
           consume_element_name
         when '.'
           next_char # skip the . or # at the beginning

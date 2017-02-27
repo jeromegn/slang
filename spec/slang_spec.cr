@@ -56,7 +56,6 @@ describe Slang do
       <span attr="hello world"></span>
       HTML
     end
-    
     it "allows dynamic classname" do
       klass = "my-class"
       render("span class=klass Foo").should eq <<-HTML
@@ -64,6 +63,20 @@ describe Slang do
       HTML
     end
 
+    it "escapes output with single = " do
+      val = %{"Hello" & world}
+      render("span attr=val").should eq <<-HTML
+      <span attr="&quot;Hello&quot; &amp; world"></span>
+      HTML
+    end
+
+    # TODO: Implement?
+    # it "does not escapes html with ==" do
+    #   val = %{Hello & world}
+    #   render("span attr==val").should eq <<-HTML
+    #   <span attr="Hello & world"></span>
+    #   HTML
+    # end
   end
 
   describe "output" do
@@ -189,5 +202,4 @@ describe Slang do
       HTML
     end
   end
-
 end

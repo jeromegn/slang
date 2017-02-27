@@ -70,6 +70,14 @@ describe Slang do
       HTML
     end
 
+    it "should allow quotes inside interpolated blocks " do
+      person = {"name" => "cris"}
+      res = render_file("spec/fixtures/interpolation-attr.slim")
+      res.should eq <<-HTML
+      <input name="cris">
+      HTML
+    end
+
     # TODO: Implement?
     # it "does not escapes html with ==" do
     #   val = %{Hello & world}

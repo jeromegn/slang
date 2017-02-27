@@ -204,7 +204,6 @@ module Slang
       @token.value = "\"#{consume_text_line.strip}#{append_whitespace ? " " : ""}\""
     end
 
-
     private def consume_text_line
       consume_string escape_double_quotes: true
     end
@@ -342,12 +341,13 @@ module Slang
       String.build do |str|
         is_str = false
         is_in_parenthesis = false
+        is_in_interpolation = false
         loop do
           case current_char
           when '='
             str << current_char if is_str
             next_char
-            if current_char == '"'
+            if current_char == '"' && !is_str
               is_str = true
               str << current_char
               next_char
@@ -356,10 +356,24 @@ module Slang
               str << current_char
               next_char
             end
+          when '#'
+            str << current_char if is_str
+            next_char
+            if current_char == '{'
+              is_in_interpolation = true
+              str << current_char
+              next_char
+            end
           when '"'
             str << current_char
             next_char
-            break
+            break if is_in_interpolation == false
+          when '}'
+            str << current_char
+            next_char
+            if is_in_interpolation
+              is_in_interpolation = false
+            end
           when ')'
             str << current_char
             next_char

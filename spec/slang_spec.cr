@@ -56,7 +56,6 @@ describe Slang do
       <span attr="hello world"></span>
       HTML
     end
-    
     it "allows dynamic classname" do
       klass = "my-class"
       render("span class=klass Foo").should eq <<-HTML
@@ -64,6 +63,34 @@ describe Slang do
       HTML
     end
 
+    it "escapes output with single = " do
+      val = %{"Hello" & world}
+      render("span attr=val").should eq <<-HTML
+      <span attr="&quot;Hello&quot; & world"></span>
+      HTML
+    end
+
+    it "should allow quotes inside interpolated blocks " do
+      person = {"name" => "cris"}
+      res = render_file("spec/fixtures/interpolation-attr.slim")
+      res.should eq <<-HTML
+      <input name="cris" value="hello">
+      HTML
+    end
+
+    it "should allow = at the end of attribute values" do
+      render(%{h1 id="asdf=" Hello}).should eq <<-HTML
+      <h1 id="asdf=">Hello</h1>
+      HTML
+    end
+
+    # TODO: Implement?
+    # it "does not escapes html with ==" do
+    #   val = %{Hello & world}
+    #   render("span attr==val").should eq <<-HTML
+    #   <span attr="Hello & world"></span>
+    #   HTML
+    # end
   end
 
   describe "output" do
@@ -189,5 +216,4 @@ describe Slang do
       HTML
     end
   end
-
 end

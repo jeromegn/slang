@@ -27,7 +27,7 @@ module Slang
           str << "#{buffer_name} << \" #{name}\"\n"
           if value
             str << "#{buffer_name} << \"=\\\"\"\n"
-            str << "(#{value}).to_s #{buffer_name}\n"
+            str << "#{buffer_name} << (#{value}).to_s.gsub(/\"/,\"&quot;\")\n"
             str << "#{buffer_name} << \"\\\"\"\n"
           end
         end

@@ -66,7 +66,7 @@ describe Slang do
     it "escapes output with single = " do
       val = %{"Hello" & world}
       render("span attr=val").should eq <<-HTML
-      <span attr="&quot;Hello&quot; &amp; world"></span>
+      <span attr="&quot;Hello&quot; & world"></span>
       HTML
     end
 

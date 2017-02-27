@@ -74,7 +74,7 @@ describe Slang do
       person = {"name" => "cris"}
       res = render_file("spec/fixtures/interpolation-attr.slim")
       res.should eq <<-HTML
-      <input name="cris">
+      <input name="cris" value="hello">
       HTML
     end
 

@@ -368,8 +368,9 @@ module Slang
             str << current_char
             next_char
             break if is_in_interpolation == false
-          when "}"
-            str << current_char if is_str
+          when '}'
+            str << current_char
+            next_char
             if is_in_interpolation
               is_in_interpolation = false
             end

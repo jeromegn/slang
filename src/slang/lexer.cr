@@ -347,7 +347,7 @@ module Slang
           when '='
             str << current_char if is_str
             next_char
-            if current_char == '"'
+            if current_char == '"' && !is_str
               is_str = true
               str << current_char
               next_char

@@ -78,6 +78,12 @@ describe Slang do
       HTML
     end
 
+    it "should allow = at the end of attribute values" do
+      render(%{h1 id="asdf=" Hello}).should eq <<-HTML
+      <h1 id="asdf=">Hello</h1>
+      HTML
+    end
+
     # TODO: Implement?
     # it "does not escapes html with ==" do
     #   val = %{Hello & world}

@@ -1,5 +1,6 @@
 module Slang
   class Lexer
+    RAWSTUFF = {"javascript:": "script", "css:": "style"}
     getter token
 
     def initialize(string)
@@ -8,16 +9,20 @@ module Slang
       @line_number = 1
       @column_number = 1
       @last_token = @token
+      @raw_text_column = 0
     end
 
     def next_token
       skip_whitespace
-
       @token = Token.new
       @token.line_number = @line_number
       @token.column_number = @column_number
 
-      inline = @last_token.type == :ELEMENT && @last_token.line_number == @line_number
+      if @raw_text_column > 0 && @column_number < @raw_text_column
+        @raw_text_column = 0
+      end
+
+      inline = @raw_text_column > 0 || (@last_token.type == :ELEMENT && @last_token.line_number == @line_number)
 
       case current_char
       when '\0'
@@ -51,7 +56,7 @@ module Slang
         end
       end
 
-      @token.inline = inline
+      @token.inline = inline unless @raw_text_column > 0
       @last_token = @token
       @token
     end
@@ -101,7 +106,7 @@ module Slang
     end
 
     private def consume_element_name
-      @token.name = consume_html_valid_name
+      @token.name = check_raw_text_header(consume_html_valid_name)
       if @token.name == "doctype"
         @token.type = :DOCTYPE
         next_char if current_char == ' '
@@ -132,6 +137,15 @@ module Slang
             break
           end
         end
+      end
+    end
+
+    private def check_raw_text_header(name : String)
+      if RAWSTUFF.has_key?(name)
+        @raw_text_column = (@column_number - name.size) + 2
+        RAWSTUFF[name]
+      else
+        name
       end
     end
 

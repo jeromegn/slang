@@ -1,7 +1,7 @@
 module Slang
   abstract class Node
     getter :parent, :token
-    delegate :value, :column_number, :line_number, :escaped, :inline, to: @token
+    delegate :value, :column_number, :line_number, :name, :escaped, :inline, to: @token
 
     def initialize(@parent : Node, @token : Token)
     end
@@ -12,6 +12,10 @@ module Slang
 
     def children?
       nodes.size > 0
+    end
+
+    def allow_children_to_escape?
+      true
     end
 
     def document?

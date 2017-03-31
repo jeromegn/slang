@@ -5,7 +5,7 @@ module Slang
         str << "#{buffer_name} << \"\n\"\n" unless str.empty? || inline
         str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
         str << "#{buffer_name} << "
-        if escaped
+        if escaped && parent.not_nil!.allow_children_to_escape?
           str << "HTML.escape((#{value}).to_s)"
         else
           str << "(#{value})"

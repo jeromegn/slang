@@ -33,6 +33,5 @@ module Slang
         @attributes[name] = value
       end
     end
-
   end
 end

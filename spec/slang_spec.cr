@@ -9,6 +9,11 @@ describe Slang do
       <head>
         <meta name="viewport" content="width=device-width,initial-scale=1.0">
         <title>This is a title</title>
+        <style>
+          h1 {color: red;}
+          p {color: green;}
+        </style>
+        <style>h2 {color: blue;}</style>
       </head>
       <body>
         <!--Multi-line comment
@@ -17,12 +22,17 @@ describe Slang do
         <!--[if IE]>
           <p>Dat browser is old.</p>
         <![endif]-->
+        <h1>This is a slang file</h1>
+        <h2>This is blue</h2>
         <span id="some-id" class="classname">
           <div id="hello" class="world world2">
             <span>
               <span data-some-var="hello world haha" two-attr="fun">and a hello</span>
               <span>
                 <span class="deep_nested">
+                  <p>
+                    text inside of &lt;p&gt;
+                  </p>
                   #{Process.pid}
                   text node
                   other text node 
@@ -39,6 +49,11 @@ describe Slang do
         </span>
         <div id="amazing-div" some-attr="hello"></div>
         <!--This is a visible comment-->
+        <script>var num1 = 8*4;</script>
+        <script>
+          var num2 = 8*3;
+          alert("8 * 3 + 8 * 4 = " + (num1 + num2);
+        </script>
       </body>
     </html>
     HTML
@@ -213,6 +228,30 @@ describe Slang do
           </defs>
         </svg>
       </div>
+      HTML
+    end
+  end
+
+  describe "raw text" do
+    it "renders javascript" do
+      res = render_file "spec/fixtures/script.slang"
+      res.should eq <<-HTML
+      <script>
+        var num = 8*3;
+        console.log(num);
+      </script>
+      <script>var num = 8*4;</script>
+      HTML
+    end
+
+    it "renders stylesheets" do
+      res = render_file "spec/fixtures/style.slang"
+      res.should eq <<-HTML
+      <style>
+        h1 {color:red;}
+        p {color:blue;}
+      </style>
+      <style>h2 {color:green;}</style>
       HTML
     end
   end

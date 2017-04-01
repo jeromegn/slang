@@ -1,6 +1,5 @@
 module Slang
   class Parser
-
     @current_node : Node
 
     def initialize(string)
@@ -14,7 +13,6 @@ module Slang
     def parse(io_name = Slang::DEFAULT_BUFFER_NAME)
       String.build do |str|
         loop do
-          # puts token.inspect
           case token.type
           when :EOF
             break

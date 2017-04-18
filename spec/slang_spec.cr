@@ -243,13 +243,15 @@ describe Slang do
       <script>var num = 8*4;</script>
       HTML
     end
-
+    
     it "renders stylesheets" do
       res = render_file "spec/fixtures/style.slang"
       res.should eq <<-HTML
       <style>
         h1 {color:red;}
-        p {color:blue;}
+        p {
+          color:blue;
+        }
       </style>
       <style>h2 {color:green;}</style>
       HTML

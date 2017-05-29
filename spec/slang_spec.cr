@@ -243,7 +243,6 @@ describe Slang do
       <script>var num = 8*4;</script>
       HTML
     end
-    
     it "renders stylesheets" do
       res = render_file "spec/fixtures/style.slang"
       res.should eq <<-HTML
@@ -254,6 +253,22 @@ describe Slang do
         }
       </style>
       <style>h2 {color:green;}</style>
+      HTML
+    end
+  end
+
+  describe "block" do
+    it "renders a simple block" do
+      res = render_file "spec/fixtures/blocks.slang"
+      res.should eq <<-HTML
+      \n<p>1</p>\n<p>2</p>\n<p>3</p>
+      HTML
+    end
+
+    it "renders complex form helpers" do
+      res = FormView.new.to_s
+      res.should eq <<-HTML
+      \n<input type="text" name="hello" \\>
       HTML
     end
   end

@@ -266,9 +266,10 @@ describe Slang do
     end
 
     it "renders complex form helpers" do
-      res = FormView.new.to_s
-      res.should eq <<-HTML
-      \n<input type="text" name="hello" \\>
+      FormView.new.to_s.should eq <<-HTML
+      <form>
+        <input type="text" name="hello" \\>
+        <input type="submit"></form>
       HTML
     end
   end

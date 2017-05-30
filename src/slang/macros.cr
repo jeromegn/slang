@@ -6,7 +6,7 @@ module Slang
   # Use in a class
   macro file(filename)
     def to_s(__slang__)
-      embed_slang {{filename}}, "__slang__"
+      Slang.embed {{filename}}, "__slang__"
     end
   end
 end

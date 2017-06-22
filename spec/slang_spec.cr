@@ -273,4 +273,14 @@ describe Slang do
       HTML
     end
   end
+
+  describe "boolean attributes" do
+    it "renders or not the attribute when a bool is used" do
+      res = render_file "spec/fixtures/boolean-attributes.slang"
+      res.should eq <<-HTML
+      <input type="checkbox" checked>
+      <input type="checkbox">
+      HTML
+    end
+  end
 end

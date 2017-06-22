@@ -28,12 +28,13 @@ module Slang
           str << "#{buffer_name} << \"\\\"\"\n"
         end
         attributes.each do |name, value|
+          next if value == "false" # don't want the attribute
           str << "#{buffer_name} << \" #{name}\"\n"
-          if value
-            str << "#{buffer_name} << \"=\\\"\"\n"
-            str << "#{buffer_name} << (#{value}).to_s.gsub(/\"/,\"&quot;\")\n"
-            str << "#{buffer_name} << \"\\\"\"\n"
-          end
+          next if value == "true" # just want the attr there
+          # any other attribute value.
+          str << "#{buffer_name} << \"=\\\"\"\n"
+          str << "#{buffer_name} << (#{value}).to_s.gsub(/\"/,\"&quot;\")\n"
+          str << "#{buffer_name} << \"\\\"\"\n"
         end
         str << "#{buffer_name} << \">\"\n"
         if children?

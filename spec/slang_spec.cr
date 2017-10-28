@@ -283,4 +283,17 @@ describe Slang do
       HTML
     end
   end
+
+  describe "attribute wrappers" do
+    it "renders attributes properly when wrapped" do
+      res = render_file "spec/fixtures/attribute-wrappers.slang"
+      res.should eq <<-HTML
+      <div hello="world" foo="bar"></div>
+      <div hello="world" foo="bar"></div>
+      <div hello="world" foo="bar"></div>
+      <div hello="world" foo="bar"></div>
+      <div hello="world" foo="bar"></div>
+      HTML
+    end
+  end
 end

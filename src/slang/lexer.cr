@@ -74,16 +74,28 @@ module Slang
         when '#'
           next_char # skip the . or # at the beginning
           consume_element_id
-        when ' '
-          consume_element_attributes
+        when ' ', '[', '(', '{'
+          open_char = current_char
+          next_char
+          consume_element_attributes(open_char)
           break
         else
           break
         end
       end
     end
-    private def consume_element_attributes
+
+    ATTR_OPEN_CLOSE_MAP = {
+      '{' => '}',
+      '[' => ']',
+      '(' => ')',
+      ' ' => ' ',
+    }
+
+    private def consume_element_attributes(open_char)
       current_attr_name = ""
+
+      close_char = ATTR_OPEN_CLOSE_MAP[open_char]
 
       loop do
         case current_char
@@ -94,7 +106,7 @@ module Slang
           break if current_attr_name.empty?
           @token.add_attribute current_attr_name, consume_value, true
           current_attr_name = ""
-        when ' '
+        when ' ', close_char
           break unless current_attr_name.empty?
           next_char
         else
@@ -337,12 +349,6 @@ module Slang
         end
       end
     end
-
-    CLOSE_OPEN_MAP = {
-      '}' => '{',
-      ']' => '[',
-      ')' => '(',
-    }
 
     STRING_OPEN_CLOSE_CHARS_MAP = {
       '(' => ')',

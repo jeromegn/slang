@@ -236,11 +236,22 @@ describe Slang do
     it "renders javascript" do
       res = render_file "spec/fixtures/script.slang"
       res.should eq <<-HTML
+      <script src="https://somecdn/vue.min.js"></script>
       <script>
         var num = 8*3;
         console.log(num);
       </script>
       <script>var num = 8*4;</script>
+      <script>
+        new Vue({
+          el: '#app',
+          template: `
+            <div>
+              something
+            </div>
+          `
+        })
+      </script>
       HTML
     end
     it "renders stylesheets" do

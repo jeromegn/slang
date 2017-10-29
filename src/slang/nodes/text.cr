@@ -4,7 +4,7 @@ module Slang
   module Nodes
     class Text < Node
       def allow_children_to_escape?
-        parent.not_nil!.allow_children_to_escape?
+        parent.allow_children_to_escape?
       end
 
       def to_s(str, buffer_name)
@@ -13,7 +13,7 @@ module Slang
         str << "#{buffer_name} << "
 
         # Escaping.
-        if escaped && parent.not_nil!.allow_children_to_escape?
+        if escaped && parent.allow_children_to_escape?
           str << "HTML.escape("
         end
 
@@ -30,7 +30,7 @@ module Slang
         end
 
         # escaping, need to close HTML.escape
-        if escaped && parent.not_nil!.allow_children_to_escape?
+        if escaped && parent.allow_children_to_escape?
           str << ".to_s)"
         end
         str << ".to_s(#{buffer_name})\n"

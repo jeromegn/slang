@@ -1,7 +1,7 @@
 module Slang
   module Nodes
     class Element < Node
-      SELF_CLOSING_TAGS = ["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"]
+      SELF_CLOSING_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "menuitem", "meta", "param", "source", "track", "wbr"}
       RAW_TEXT_TAGS     = %w(script style)
 
       delegate :name, :id, :attributes, to: @token

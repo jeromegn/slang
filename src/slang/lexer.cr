@@ -39,6 +39,9 @@ module Slang
         inline ? consume_text : consume_element
       when '-'
         inline ? consume_text : consume_control
+      when ':'
+        inline = false # don't consider this "inline" for output
+        consume_inline_element
       when '='
         consume_output
       when '|', '\''
@@ -61,6 +64,13 @@ module Slang
       @token
     end
 
+    ATTR_OPEN_CLOSE_MAP = {
+      '{' => '}',
+      '[' => ']',
+      '(' => ')',
+      ' ' => ' ',
+    }
+
     private def consume_element
       @token.type = :ELEMENT
 
@@ -69,15 +79,15 @@ module Slang
         when .ascii_letter?
           consume_element_name
         when '.'
-          next_char # skip the . or # at the beginning
+          next_char # skip the '.' at the beginning
           consume_element_class
         when '#'
-          next_char # skip the . or # at the beginning
+          next_char # skip the '#' at the beginning
           consume_element_id
         when ' ', '[', '(', '{'
-          open_char = current_char
+          close_char = ATTR_OPEN_CLOSE_MAP[current_char]
           next_char
-          consume_element_attributes(open_char)
+          consume_element_attributes(close_char)
           break
         else
           break
@@ -85,17 +95,14 @@ module Slang
       end
     end
 
-    ATTR_OPEN_CLOSE_MAP = {
-      '{' => '}',
-      '[' => ']',
-      '(' => ')',
-      ' ' => ' ',
-    }
+    private def consume_inline_element
+      next_char # skip ':'
+      skip_whitespace
+      consume_element
+    end
 
-    private def consume_element_attributes(open_char)
+    private def consume_element_attributes(close_char)
       current_attr_name = ""
-
-      close_char = ATTR_OPEN_CLOSE_MAP[open_char]
 
       loop do
         case current_char
@@ -142,12 +149,16 @@ module Slang
       String.build do |str|
         loop do
           case current_char
-          when .alphanumeric?, '-', '_', ':'
-            str << current_char
-            next_char
+          when ':'
+            break if ATTR_OPEN_CLOSE_MAP.keys.includes? peek_next_char
+          when .alphanumeric?, '-', '_'
+            # continue
           else
             break
           end
+
+          str << current_char
+          next_char
         end
       end
     end

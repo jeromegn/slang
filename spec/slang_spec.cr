@@ -296,4 +296,28 @@ describe Slang do
       HTML
     end
   end
+
+  describe "inline tags" do
+    it "renders inlined tags" do
+      res = render_file "spec/fixtures/inline-tags.slang"
+      res.should eq <<-HTML
+      <ul>
+        <li class="first">
+          <a href="/a">A link</a>
+        </li>
+        <li>
+          <a href="/b">B link</a>
+        </li>
+      </ul>
+      <ul>
+        <li class="first">
+          <a href="/a">A link</a>
+        </li>
+        <li>
+          <a href="/b">B link</a>
+        </li>
+      </ul>
+      HTML
+    end
+  end
 end

@@ -22,10 +22,14 @@ module Slang
             @document.nodes << Nodes::Doctype.new(@document, token)
             next_token
           when :ELEMENT, :TEXT, :HTML, :COMMENT, :CONTROL, :OUTPUT
-            parent = @current_node.not_nil!
+            parent = @current_node
+
+            # find the parent
             until parent.is_a?(Document)
-              break if parent.not_nil!.column_number < token.column_number
-              parent = parent.not_nil!.parent.not_nil!
+              # column number is smaller than the node we're processing
+              # therefore it is the parent
+              break if parent.column_number < token.column_number
+              parent = parent.parent
             end
 
             node = case token.type
@@ -39,9 +43,6 @@ module Slang
                      Nodes::Text.new(parent, token)
                    end
 
-            # puts node.inspect
-            # puts @control_nodes_per_column[node.column_number]?
-
             if node.is_a?(Nodes::Control)
               if @control_nodes_per_column[node.column_number]?
                 last_control_node = @control_nodes_per_column[node.column_number]
@@ -51,14 +52,14 @@ module Slang
                   last_control_node.branches << node
                 else
                   @control_nodes_per_column[node.column_number] = node
-                  parent.not_nil!.nodes << node
+                  parent.nodes << node
                 end
               else
                 @control_nodes_per_column[node.column_number] = node
-                parent.not_nil!.nodes << node
+                parent.nodes << node
               end
             else
-              parent.not_nil!.nodes << node
+              parent.nodes << node
             end
             @current_node = node
             next_token

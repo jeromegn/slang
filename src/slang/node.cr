@@ -22,19 +22,18 @@ module Slang
       false
     end
 
-    def indentation_spaces
-      if column_number == 1
-        0
-      else
-        control_depth = 0
-        current_parent = parent
-        # de-indent blocks
-        until current_parent.is_a?(Document)
-          control_depth += 1 if current_parent.class.name.ends_with?("Control")
-          current_parent = current_parent.not_nil!.parent.not_nil!
-        end
-        [(column_number - (control_depth * 2)), 1].max - 1
+    def printable_parents_count
+      count = 0
+      current_parent = parent
+      until current_parent.is_a?(Document)
+        count += 1 unless current_parent.class.name.ends_with?("Control")
+        current_parent = current_parent.parent
       end
+      return count
+    end
+
+    def indentation_spaces
+      printable_parents_count * 2
     end
 
     def indent?

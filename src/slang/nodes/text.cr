@@ -1,4 +1,4 @@
-require "secure_random"
+require "random/secure"
 
 module Slang
   module Nodes
@@ -19,7 +19,7 @@ module Slang
 
         # This is an output (code) token and has children
         if token.type == :OUTPUT && children?
-          sub_buffer_name = "#{buffer_name}#{SecureRandom.hex(8)}"
+          sub_buffer_name = "#{buffer_name}#{Random::Secure.hex(8)}"
           str << "(#{value}\nString.build do |#{sub_buffer_name}|\n"
           nodes.each do |node|
             node.to_s(str, "#{sub_buffer_name}")

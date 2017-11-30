@@ -144,7 +144,7 @@ Compiles to HTML:
     <script>var num1 = 8*4;</script>
     <script>
       var num2 = 8*3;
-      alert("8 * 3 + 8 * 4 = " + (num1 + num2);
+      alert("8 * 3 + 8 * 4 = " + (num1 + num2));
     </script>
   </body>
 </html>

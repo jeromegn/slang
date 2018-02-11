@@ -28,11 +28,8 @@ module Slang
       when '\0'
         @token.type = :EOF
       when '\r'
-        if next_char == '\n'
-          consume_newline
-        else
-          raise "expected '\\n' after '\\r'"
-        end
+        raise "slang expected '\\n' after '\\r'" unless next_char == '\n'
+        consume_newline
       when '\n'
         consume_newline
       when '.', '#', .ascii_letter?
@@ -188,8 +185,10 @@ module Slang
             when ']'
               next_char
               break
-            when '\0', '\n', '\r'
+            when '\0', '\n'
               break
+            when '\r'
+              raise "slang expected '\\n' after '\\r'" unless next_char == '\n'
             else
               str << current_char
               next_char
@@ -418,9 +417,7 @@ module Slang
       loop do
         case next_char
         when '\r'
-          unless next_char == '\n'
-            raise "expected '\\n' after '\\r'"
-          end
+          raise "slang expected '\\n' after '\\r'" unless next_char == '\n'
         when '\n'
           # Nothing
         else

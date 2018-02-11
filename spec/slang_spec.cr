@@ -1,5 +1,17 @@
 require "./spec_helper"
 
+def evaluates_to_true
+  1 == 1
+end
+
+def evaluates_to_false
+  1 == 2
+end
+
+def evaluates_to_hello
+  "hello"
+end
+
 describe Slang do
   it "renders a basic document" do
     res = render_file("spec/fixtures/basic.slang")
@@ -291,6 +303,10 @@ describe Slang do
       res.should eq <<-HTML
       <input type="checkbox" checked>
       <input type="checkbox">
+      <input type="checkbox" checked="checked">
+      <input type="checkbox" checked>
+      <input type="checkbox">
+      <input type="checkbox" checked="hello">
       HTML
     end
   end

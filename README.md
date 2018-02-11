@@ -51,7 +51,7 @@ html
     meta name="viewport" content="width=device-width,initial-scale=1.0"
     title This is a title
     css:
-      h1 {color: red;} 
+      h1 {color: red;}
       p {color: green;}
     style h2 {color: blue;}
   body
@@ -61,6 +61,9 @@ html
       p Dat browser is old.
     h1 This is a slang file
     h2 This is blue
+    input type="checkbox" checked=false
+    input type="checkbox" checked=true
+    input type="checkbox" checked="checked"
     span#some-id.classname
       #hello.world.world2
         - some_var = "hello world haha"
@@ -117,6 +120,9 @@ Compiles to HTML:
     <![endif]-->
     <h1>This is a slang file</h1>
     <h2>This is blue</h2>
+    <input type="checkbox"/>
+    <input type="checkbox" checked/>
+    <input type="checkbox" checked="checked"/>
     <span id="some-id" class="classname">
       <div id="hello" class="world world2">
         <span>
@@ -128,7 +134,7 @@ Compiles to HTML:
               </p>
               #{Process.pid}
               text node
-              other text node 
+              other text node
             </span>
           </span>
         </span>

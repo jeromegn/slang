@@ -318,6 +318,7 @@ describe Slang do
       <div hello="world" foo="bar"></div>
       <div hello="world" foo="bar"></div>
       <div hello="world" foo="bar"></div>
+      <div hello="#{Process.pid}"></div>
       <div hello="world" foo="bar"></div>
       <div hello="world" foo="bar"></div>
       HTML

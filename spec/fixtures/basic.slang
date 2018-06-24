@@ -8,10 +8,12 @@ html
       p {color: green;}
     style h2 {color: blue;}
   body
-    / Multi-line comment
+    /! Multi-line comment
       span this is wrapped in a comment
     /[if IE]
       p Dat browser is old.
+    / Invisible multi-line comment
+      span this is wrapped in a comment
     h1 This is a slang file
     h2 This is blue
     span#some-id.classname

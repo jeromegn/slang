@@ -55,10 +55,12 @@ html
       p {color: green;}
     style h2 {color: blue;}
   body
-    / Multi-line comment
+    /! Visible multi-line comment
       span this is wrapped in a comment
     /[if IE]
       p Dat browser is old.
+    / Invisible multi-line comment
+      span this is wrapped in a comment
     h1 This is a slang file
     h2 This is blue
     input type="checkbox" checked=false
@@ -112,7 +114,7 @@ Compiles to HTML:
     <style>h2 {color: blue;}</style>
   </head>
   <body>
-    <!--Multi-line comment
+    <!--Visible multi-line comment
       <span>this is wrapped in a comment</span>
     -->
     <!--[if IE]>

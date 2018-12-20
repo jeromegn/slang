@@ -1,4 +1,5 @@
 require "./spec_helper"
+require "json"
 
 def evaluates_to_true
   1 == 1
@@ -172,6 +173,7 @@ describe Slang do
       res.should eq <<-HTML
       <table>
         <tr><td>#{Process.pid}</td></tr>
+        <tr><td>"hello\\u0021"</td></tr>
       </table>
       HTML
     end
@@ -279,6 +281,11 @@ describe Slang do
           `
         })
       </script>
+      <script>
+        let twoLines = "bar\\nbaz";
+        let hello = "Hello, world!";
+        let obj = {"a":17,"b":"foo"};
+      </script>
       HTML
     end
     it "renders stylesheets" do
@@ -335,7 +342,9 @@ describe Slang do
       <div hello="world" foo="bar"></div>
       <div hello="#{Process.pid}"></div>
       <div hello="world" foo="bar"></div>
+      <div hello="world\\u0021" foo="bar"></div>
       <div hello="world" foo="bar"></div>
+      <div hello="world!" foo="bar"></div>
       HTML
     end
   end

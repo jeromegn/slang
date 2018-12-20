@@ -206,7 +206,7 @@ module Slang
       @token.type = :CONTROL
       next_char
       next_char if current_char == ' '
-      @token.value = consume_line
+      @token.value = consume_line(escape_double_quotes=false)
     end
 
     private def consume_output
@@ -228,7 +228,7 @@ module Slang
       end
 
       skip_whitespace
-      @token.value = consume_line.strip
+      @token.value = consume_line(escape_double_quotes=false).strip
       @token.value = " #{@token.value}" if prepend_whitespace
       @token.value = "#{@token.value} " if append_whitespace
     end
@@ -257,14 +257,14 @@ module Slang
             cc = STRING_OPEN_CLOSE_CHARS_MAP[current_char]
             str << current_char
             next_char
-            str << consume_string open_char: oc, close_char: cc
+            str << consume_string open_char: oc, close_char: cc, crystal: true
             next
           end
           if current_char == '"' || current_char == '\''
             ch = current_char
             str << current_char
             next_char
-            str << consume_string open_char: ch, close_char: ch
+            str << consume_string open_char: ch, close_char: ch, crystal: true
             next
           end
           if current_char == '}'
@@ -283,7 +283,7 @@ module Slang
       end
     end
 
-    private def consume_string(open_char = '"', close_char = '"', escape_double_quotes = false)
+    private def consume_string(open_char = '"', close_char = '"', escape_double_quotes = false, crystal = false)
       level = 0
       escaped = false
       maybe_string_interpolation = false
@@ -326,10 +326,11 @@ module Slang
             maybe_string_interpolation = true
           end
 
-          if current_char == '\\' && !escaped
-            escaped = true
-          else
+          if escaped
             escaped = false
+            str << '\\' unless crystal
+          elsif current_char == '\\'
+            escaped = true
           end
 
           if current_char == '\n' || current_char == '\0'
@@ -348,12 +349,16 @@ module Slang
       @token.value = "\"#{consume_line}\""
     end
 
-    private def consume_line
+    private def consume_line(escape_double_quotes=true)
       String.build do |str|
         loop do
           if current_char == '\n' || current_char == '\0'
             break
           else
+            if escape_double_quotes && (current_char == '"' || current_char == '\\')
+              str << '\\'
+            end
+
             str << current_char
             next_char
           end

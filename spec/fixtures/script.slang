@@ -15,3 +15,8 @@ javascript:
       </div>
     `
   })
+
+javascript:
+  let twoLines = "bar\nbaz";
+  let hello = "#{"Hello, " + "world!"}";
+  let obj = #{{:a => 17, "b" => "foo"}.to_json};

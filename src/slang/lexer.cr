@@ -119,7 +119,7 @@ module Slang
         end
       end
 
-      go_back(current_attr_name.size)
+      go_back(current_attr_name.size, current_attr_name.bytesize)
     end
 
     private def consume_element_name
@@ -431,9 +431,9 @@ module Slang
       @token.type = :NEWLINE
     end
 
-    private def go_back(n)
-      @column_number -= n
-      @reader.pos -= n
+    private def go_back(column, bytes)
+      @column_number -= column
+      @reader.pos -= bytes
     end
 
     private def next_char

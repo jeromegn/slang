@@ -71,6 +71,21 @@ describe Slang do
     HTML
   end
 
+  it "renders a UTF8 text" do
+    res = render_file("spec/fixtures/utf8.slang")
+    res.should eq <<-HTML
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Привет, мир</title>
+      </head>
+      <body>
+        <p>Предложение</p>
+      </body>
+    </html>
+    HTML
+  end
+
   describe "attributes" do
     it "accepts string values" do
       render("span attr=\"hello\"").should eq <<-HTML

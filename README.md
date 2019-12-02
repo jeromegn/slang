@@ -18,6 +18,13 @@ dependencies:
 
 [Kilt](https://github.com/jeromegn/kilt) is included as a dependency for this project. It should help integrating non-ECR template engines.
 
+Add this to your application's `shard.yml`:
+```yaml
+dependencies:
+  kilt:
+    github: jeromegn/kilt
+```
+
 ```
 require "kilt/slang"
 

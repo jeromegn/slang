@@ -1,4 +1,4 @@
-# Slang [![Build Status](https://travis-ci.org/jeromegn/slang.svg?branch=master)](https://travis-ci.org/jeromegn/slang) [![Dependency Status](https://shards.rocks/badge/github/jeromegn/slang/status.svg)](https://shards.rocks/github/jeromegn/slang) [![devDependency Status](https://shards.rocks/badge/github/jeromegn/slang/dev_status.svg)](https://shards.rocks/github/jeromegn/slang)
+# Slang [![Build Status](https://travis-ci.org/jeromegn/slang.svg?branch=master)](https://travis-ci.org/jeromegn/slang)
 
 Lightweight, terse, templating language for Crystal.
 

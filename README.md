@@ -166,6 +166,11 @@ Compiles to HTML:
 </html>
 ```
 
+### Difference between single and double equals in Slang
+
+* `=` inserts HTML with escaped characters
+* `==` inserts HTML without escaping. It is needed when you have already rendered HTML and you need to insert it to your layout directly.
+
 ## TODO
 
 - [x] Fix known limitations

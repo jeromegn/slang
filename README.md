@@ -90,7 +90,10 @@ html
             - ["ah", "oh"].each do |s|
               span = s
     / This is an invisible comment
-    #amazing-div some-attr="hello"
+    - if true == true
+      #amazing-div some-attr="hello"
+    - else
+      #not-so-amazing-div some-attr="goodbye"
     /! This is a visible comment
     script var num1 = 8*4;
 

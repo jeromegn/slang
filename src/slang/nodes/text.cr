@@ -8,8 +8,6 @@ module Slang
       end
 
       def to_s(str, buffer_name)
-        str << "#{buffer_name} << \"\n\"\n" unless str.empty? || inline
-        str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
         str << "#{buffer_name} << "
 
         # Escaping.

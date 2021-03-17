@@ -16,8 +16,6 @@ module Slang
       end
 
       def to_s(str, buffer_name)
-        str << "#{buffer_name} << \"\n\"\n" unless str.empty?
-        str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
         str << "#{buffer_name} << \"<#{name}\"\n"
         str << "#{buffer_name} << \" id=\\\"#{id}\\\"\"\n" if id
         c_names = generate_class_names
@@ -45,16 +43,8 @@ module Slang
           end
         end
         if !self_closing?
-          if children? && !only_inline_children?
-            str << "#{buffer_name} << \"\n\"\n"
-            str << "#{buffer_name} << \"#{indentation}\"\n" if indent?
-          end
           str << "#{buffer_name} << \"</#{name}>\"\n"
         end
-      end
-
-      def only_inline_children?
-        nodes.all? { |n| n.inline }
       end
 
       def self_closing?

@@ -73,6 +73,13 @@ html
     input type="checkbox" checked=false
     input type="checkbox" checked=true
     input type="checkbox" checked="checked"
+    span
+      | hello
+      = " "
+      | world
+    span
+      ' hello
+      | world
     span#some-id.classname
       #hello.world.world2
         - some_var = "hello world haha"
@@ -84,7 +91,7 @@ html
                 | text inside of <p>
               = Process.pid
               | text node
-              ' other text node
+              ' other text with space after it
         span.alongside pid=Process.pid
           custom-tag#with-id pid="#{Process.pid}"
             - ["ah", "oh"].each do |s|
@@ -109,7 +116,13 @@ some_var = "hello"
 strings = ["ah", "oh"]
 ```
 
-Compiles to HTML:
+Compiles to HTML without any spaces around and inside tags, just like ReactJS do:
+
+```html
+<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>This is a title</title><style>h1 {color: red;}p {color: green;}</style><style>h2 {color: blue;}</style></head><body><h1>This is a slang file</h1><h2>This is blue</h2><input type="checkbox"/><input type="checkbox" checked/><input type="checkbox" checked="checked"/><span>hello world</span><span>hello world</span><span id="some-id" class="classname"><div id="hello" class="world world2"><span><span data-some-var="hello world haha" two-attr="fun">and a hello</span><span><span class="deep_nested"><p>text inside of &lt;p&gt;</p>#{Process.pid}text nodeother text with space after it </span></span></span><span class="alongside" pid="#{Process.pid}"><custom-tag id="with-id" pid="#{Process.pid}"><span>ah</span><span>oh</span></custom-tag></span></div></span><div id="amazing-div" some-attr="hello"></div><script>var num1 = 8*4;</script><script>var num2 = 8*3;alert("8 * 3 + 8 * 4 = " + (num1 + num2));</script></body></html>
+```
+
+Beautified version of HTML would look like that (for reference only):
 
 ```html
 <!DOCTYPE html>
@@ -117,37 +130,27 @@ Compiles to HTML:
   <head>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>This is a title</title>
-    <style>
-      h1 {color: red;}
-      p {color: green;}
-    </style>
+    <style>h1 {color: red;}p {color: green;}</style>
     <style>h2 {color: blue;}</style>
   </head>
   <body>
-    <!--Visible multi-line comment
-      <span>this is wrapped in a comment</span>
-    -->
-    <!--[if IE]>
-      <p>Dat browser is old.</p>
-    <![endif]-->
+    <!--Visible multi-line comment<span>this is wrapped in a comment</span>-->
+    <!--[if IE]><p>Dat browser is old.</p><![endif]-->
     <h1>This is a slang file</h1>
     <h2>This is blue</h2>
     <input type="checkbox"/>
     <input type="checkbox" checked/>
     <input type="checkbox" checked="checked"/>
+    <span>hello world</span>
+    <span>hello world</span>
     <span id="some-id" class="classname">
       <div id="hello" class="world world2">
         <span>
           <span data-some-var="hello world haha" two-attr="fun">and a hello</span>
           <span>
             <span class="deep_nested">
-              <p>
-                text inside of &lt;p&gt;
-              </p>
-              #{Process.pid}
-              text node
-              other text node
-            </span>
+              <p>text inside of &lt;p&gt;</p>
+              #{Process.pid}text nodeother text with space after it </span>
           </span>
         </span>
         <span class="alongside" pid="#{Process.pid}">
@@ -161,10 +164,7 @@ Compiles to HTML:
     <div id="amazing-div" some-attr="hello"></div>
     <!--This is a visible comment-->
     <script>var num1 = 8*4;</script>
-    <script>
-      var num2 = 8*3;
-      alert("8 * 3 + 8 * 4 = " + (num1 + num2));
-    </script>
+    <script>var num2 = 8*3;alert("8 * 3 + 8 * 4 = " + (num1 + num2));</script>
   </body>
 </html>
 ```
@@ -173,6 +173,53 @@ Compiles to HTML:
 
 * `=` inserts HTML with escaped characters
 * `==` inserts HTML without escaping. It is needed when you have already rendered HTML and you need to insert it to your layout directly.
+
+### How to add spaces
+
+1. use `'` instead of `|` to add one space after text node
+
+```slim
+  span
+    ' hello
+    | world
+```
+
+```html
+  <span>hello world</span>
+```
+
+2. you can use `=` to add any number of spaces:
+
+```slim
+  span
+    = " "
+    | hello
+    = " "
+    | world
+    = " "
+```
+
+```html
+  <span> hello world </span>
+```
+
+### Limitation
+
+All JS and CSS code within `javascript:` and `css:` sections is minified in imperfect way, 
+so all space are removed even inside Template literals. For example:
+
+```slim
+  javascript:
+    let x = `
+    
+      string
+
+    `
+```
+
+```html
+  <script>let x = `string`</span>
+```
 
 ## TODO
 

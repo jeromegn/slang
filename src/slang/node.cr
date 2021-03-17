@@ -23,6 +23,10 @@ module Slang
     end
 
     def to_s(str, buffer_name)
+      render_children(str, buffer_name)
+    end
+
+    private def render_children(str, buffer_name)
       nodes.each do |node|
         node.to_s(str, buffer_name)
       end

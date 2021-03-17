@@ -69,17 +69,15 @@ module Slang
 
       def to_s(str, buffer_name)
         str << "#{value}\n"
-        if children?
-          nodes.each do |node|
-            node.to_s(str, buffer_name)
-          end
-        end
-        if branches?
-          branches.each do |branch|
-            branch.to_s(str, buffer_name)
-          end
-        end
+        render_children(str, buffer_name)
+        render_branches(str, buffer_name)
         str << "end\n" if endable?
+      end
+
+      private def render_branches(str, buffer_name)
+        branches.each do |branch|
+          branch.to_s(str, buffer_name)
+        end
       end
     end
   end

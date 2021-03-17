@@ -37,11 +37,7 @@ module Slang
           str << "end\n"
         end
         str << "#{buffer_name} << \">\"\n"
-        if children?
-          nodes.each do |node|
-            node.to_s(str, buffer_name)
-          end
-        end
+        render_children(str, buffer_name)
         if !self_closing?
           str << "#{buffer_name} << \"</#{name}>\"\n"
         end

@@ -4,6 +4,6 @@ version: 1.7.2
 authors:
   - Jerome Gravel-Niquet <jeromegn@gmail.com>
 
-crystal: 0.25.0
+crystal: '>= 0.25.0, < 2.0.0'
 
 license: MIT

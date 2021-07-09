@@ -7,7 +7,7 @@ module Slang
       :attributes,
       :id
 
-    property :value, :escaped, :inline, :visible, :conditional
+    property :value, :escaped, :visible, :conditional
 
     @value : String?
     @id : String?
@@ -19,7 +19,6 @@ module Slang
       @name = "div"
       @attributes = {} of String => (String | Set(String))
       @escaped = true
-      @inline = false
       @visible = true
       @conditional = ""
       @attributes["class"] = Set(String).new

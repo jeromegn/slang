@@ -37,7 +37,7 @@ Example with [Kemal](http://kemalcr.com) (includes Kilt):
 require "kilt/slang"
 
 get "/" do
-  render "path/to/file.slang"
+  Kilt.render "path/to/file.slang"
 end
 ```
 

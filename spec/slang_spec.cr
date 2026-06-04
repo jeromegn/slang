@@ -372,4 +372,11 @@ describe Slang do
       HTML
     end
   end
+
+  describe "Windows CRLF line endings" do
+    it "renders template with CRLF endings properly" do
+      res = render "div(hello=\"world\")\r\n  span pid=Process.pid\r\n"
+      res.should eq "<div hello=\"world\">\n  <span pid=\"#{Process.pid}\"></span>\n</div>"
+    end
+  end
 end

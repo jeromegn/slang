@@ -333,7 +333,10 @@ module Slang
             escaped = true
           end
 
-          if current_char == '\n' || current_char == '\0'
+          if current_char == '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
+          elsif current_char == '\n' || current_char == '\0'
             break
           else
             str << current_char
@@ -352,7 +355,10 @@ module Slang
     private def consume_line(escape_double_quotes=true)
       String.build do |str|
         loop do
-          if current_char == '\n' || current_char == '\0'
+          if current_char == '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
+          elsif current_char == '\n' || current_char == '\0'
             break
           else
             if escape_double_quotes && (current_char == '"' || current_char == '\\')
@@ -406,6 +412,9 @@ module Slang
             open_count -= 1
             str << current_char
             next_char
+          when '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
           when '\n', '\0'
             break
           else

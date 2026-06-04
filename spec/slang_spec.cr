@@ -252,8 +252,8 @@ describe Slang do
       <div>
         <svg width="256" height="448" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
           <defs>
-            <path id=\"shape1\" d=\"M184 144q0 3.25-2.375\"></path>
-            <path id=\"shape2\" d=\"M184 144q0 3.25-2.375\"></path>
+            <path id="shape1" d="M184 144q0 3.25-2.375"></path>
+            <path id="shape2" d="M184 144q0 3.25-2.375"></path>
           </defs>
         </svg>
       </div>
@@ -370,6 +370,13 @@ describe Slang do
         </li>
       </ul>
       HTML
+    end
+  end
+
+  describe "Windows CRLF line endings" do
+    it "renders template with CRLF endings properly" do
+      res = render "div(hello=\"world\")\r\n  span pid=Process.pid\r\n"
+      res.should eq "<div hello=\"world\">\n  <span pid=\"#{Process.pid}\"></span>\n</div>"
     end
   end
 end

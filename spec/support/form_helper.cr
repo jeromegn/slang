@@ -8,11 +8,11 @@ class Form
 end
 
 module FormHelper
-  def form_for
-    @form = Form.new
+  def form_for(&)
+    @form = form = Form.new
     String.build do |__form__|
       __form__ << "<form>"
-      __form__ << yield @form.not_nil!
+      __form__ << yield form
       __form__ << "</form>"
     end
   end

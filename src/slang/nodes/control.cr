@@ -9,36 +9,40 @@ module Slang
         !branches.empty?
       end
 
+      private def control_value : String
+        value || ""
+      end
+
       def if?
-        value.not_nil!.starts_with?("if ")
+        control_value.starts_with?("if ")
       end
 
       def else?
-        value.not_nil!.match /^else\s{0,}/
+        control_value.match /^else\s{0,}/
       end
 
       def elsif?
-        value.not_nil!.starts_with?("elsif ")
+        control_value.starts_with?("elsif ")
       end
 
       def begin?
-        value.not_nil!.match(/^begin\s{0,}/)
+        control_value.match(/^begin\s{0,}/)
       end
 
       def rescue?
-        value.not_nil!.match(/^rescue\s{0,}/)
+        control_value.match(/^rescue\s{0,}/)
       end
 
       def ensure?
-        value.not_nil!.match /^ensure\s{0,}/
+        control_value.match /^ensure\s{0,}/
       end
 
       def case?
-        value.not_nil!.starts_with?("case ")
+        control_value.starts_with?("case ")
       end
 
       def when?
-        value.not_nil!.starts_with?("when ")
+        control_value.starts_with?("when ")
       end
 
       def branch?
@@ -68,7 +72,7 @@ module Slang
       end
 
       def to_s(str, buffer_name)
-        str << "#{value}\n"
+        str << "#{control_value}\n"
         if children?
           nodes.each do |node|
             node.to_s(str, buffer_name)

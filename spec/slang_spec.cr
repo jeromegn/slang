@@ -372,4 +372,11 @@ describe Slang do
       HTML
     end
   end
+
+  describe "Windows CRLF line endings" do
+    it "renders template with CRLF endings properly" do
+      res = render "doctype html\r\nhtml\r\n  body\r\n    span Text\r\n"
+      res.should eq "<!DOCTYPE html>\n<html>\n  <body>\n    <span>Text</span>\n  </body>\n</html>"
+    end
+  end
 end

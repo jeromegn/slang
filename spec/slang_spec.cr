@@ -109,7 +109,21 @@ describe Slang do
     it "escapes output with single = " do
       val = %{"Hello" & world}
       render("span attr=val").should eq <<-HTML
-      <span attr="&quot;Hello&quot; & world"></span>
+      <span attr="&quot;Hello&quot; &amp; world"></span>
+      HTML
+    end
+
+    it "escapes dynamic attribute ampersands" do
+      val = "hello & world"
+      render("span attr=val").should eq <<-HTML
+      <span attr="hello &amp; world"></span>
+      HTML
+    end
+
+    it "escapes dynamic attribute angle brackets" do
+      val = "<hello>"
+      render("span attr=val").should eq <<-HTML
+      <span attr="&lt;hello&gt;"></span>
       HTML
     end
 

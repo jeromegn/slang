@@ -33,7 +33,7 @@ module Slang
           str << "unless #{value} == true\n" # remove the value if value evaluates to true
           # any other attribute value.
           str << "#{buffer_name} << \"=\\\"\"\n"
-          str << "#{buffer_name} << (#{value}).to_s.gsub(/\"/,\"&quot;\")\n"
+          str << "#{buffer_name} << HTML.escape((#{value}).to_s)\n"
           str << "#{buffer_name} << \"\\\"\"\n"
           str << "end\n"
           str << "end\n"

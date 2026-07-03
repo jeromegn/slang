@@ -252,8 +252,8 @@ describe Slang do
       <div>
         <svg width="256" height="448" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
           <defs>
-            <path id=\"shape1\" d=\"M184 144q0 3.25-2.375\"></path>
-            <path id=\"shape2\" d=\"M184 144q0 3.25-2.375\"></path>
+            <path id="shape1" d="M184 144q0 3.25-2.375"></path>
+            <path id="shape2" d="M184 144q0 3.25-2.375"></path>
           </defs>
         </svg>
       </div>
@@ -347,6 +347,24 @@ describe Slang do
       <div hello="world!" foo="bar"></div>
       HTML
     end
+    it "renders multiline attributes inside wrapper" do
+      res = render(%{script{\n  defer=true\n  crossorigin="anonymous"\n}})
+      res.should eq <<-HTML
+      <script defer crossorigin="anonymous"></script>
+      HTML
+    end
+    it "renders multiline attributes inside wrapper with bare attributes" do
+      res = render(%{script{\n  defer\n  crossorigin="anonymous"\n}})
+      res.should eq <<-HTML
+      <script defer crossorigin="anonymous"></script>
+      HTML
+    end
+    it "renders inline content after multiline attributes wrapper correctly" do
+      res = render(%{a{\n  href="/"\n} Link})
+      res.should eq <<-HTML
+      <a href="/">Link</a>
+      HTML
+    end
   end
 
   describe "inline tags" do
@@ -370,6 +388,13 @@ describe Slang do
         </li>
       </ul>
       HTML
+    end
+  end
+
+  describe "Windows CRLF line endings" do
+    it "renders template with CRLF endings properly" do
+      res = render "div(hello=\"world\")\r\n  span pid=Process.pid\r\n"
+      res.should eq "<div hello=\"world\">\n  <span pid=\"#{Process.pid}\"></span>\n</div>"
     end
   end
 end

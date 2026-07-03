@@ -1,7 +1,7 @@
 module Slang
   class Token
     property :type
-    property :line_number, :column_number
+    property :line_number, :column_number, :end_line_number
     # elements
     property :name,
       :attributes,
@@ -16,6 +16,7 @@ module Slang
       @type = :EOF
       @line_number = 0
       @column_number = 0
+      @end_line_number = 0
       @name = "div"
       @attributes = {} of String => (String | Set(String))
       @escaped = true

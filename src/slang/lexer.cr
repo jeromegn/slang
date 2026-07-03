@@ -206,7 +206,7 @@ module Slang
       @token.type = :CONTROL
       next_char
       next_char if current_char == ' '
-      @token.value = consume_line(escape_double_quotes=false)
+      @token.value = consume_line(escape_double_quotes = false)
     end
 
     private def consume_output
@@ -228,7 +228,7 @@ module Slang
       end
 
       skip_whitespace
-      @token.value = consume_line(escape_double_quotes=false).strip
+      @token.value = consume_line(escape_double_quotes = false).strip
       @token.value = " #{@token.value}" if prepend_whitespace
       @token.value = "#{@token.value} " if append_whitespace
     end
@@ -291,6 +291,10 @@ module Slang
         loop do
           if escape_double_quotes
             if current_char == '"'
+              if escaped
+                escaped = false
+                str << '\\' unless crystal
+              end
               str << "\\\""
               next_char
               next
@@ -328,12 +332,21 @@ module Slang
 
           if escaped
             escaped = false
-            str << '\\' unless crystal
+            unless crystal
+              if current_char == '#' || current_char == '\\'
+                str << "\\\\"
+              else
+                str << '\\'
+              end
+            end
           elsif current_char == '\\'
             escaped = true
           end
 
-          if current_char == '\n' || current_char == '\0'
+          if current_char == '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
+          elsif current_char == '\n' || current_char == '\0'
             break
           else
             str << current_char
@@ -349,10 +362,13 @@ module Slang
       @token.value = "\"#{consume_line}\""
     end
 
-    private def consume_line(escape_double_quotes=true)
+    private def consume_line(escape_double_quotes = true)
       String.build do |str|
         loop do
-          if current_char == '\n' || current_char == '\0'
+          if current_char == '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
+          elsif current_char == '\n' || current_char == '\0'
             break
           else
             if escape_double_quotes && (current_char == '"' || current_char == '\\')
@@ -406,6 +422,9 @@ module Slang
             open_count -= 1
             str << current_char
             next_char
+          when '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
           when '\n', '\0'
             break
           else

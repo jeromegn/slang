@@ -5,6 +5,13 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Ameba Linter
+        uses: crystal-ameba/github-action@master
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -17,3 +24,4 @@ jobs:
           crystal: latest
       - run: shards install
       - run: crystal spec
+      - run: crystal spec -Dslang_i18n_disabled spec/i18n_flag_spec.cr

@@ -14,3 +14,15 @@ macro render(slang)
     \{{ run("./support/process", {{slang}}, "__str__") }}
   end
 end
+
+macro render_file_i18n(filename, lang, locales_dir = "spec/fixtures/locales")
+  String.build do |__str__|
+    \{{ run("./support/process_file_i18n", {{filename}}, "__str__", {{locales_dir}}, {{lang.stringify}}) }}
+  end
+end
+
+macro render_i18n(slang, lang, locales_dir = "spec/fixtures/locales")
+  String.build do |__str__|
+    \{{ run("./support/process_i18n", {{slang}}, "__str__", {{locales_dir}}, {{lang.stringify}}) }}
+  end
+end

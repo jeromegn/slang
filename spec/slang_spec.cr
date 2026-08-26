@@ -13,6 +13,22 @@ def evaluates_to_hello
   "hello"
 end
 
+def passthrough(arg)
+  arg
+end
+
+def extract(slang) : Array(Slang::Extractor::Entry)
+  extractor = Slang::Extractor.new
+  Slang::Parser.new(slang).parse.accept(extractor)
+  extractor.entries
+end
+
+def codegen(slang, catalog = nil) : String
+  cg = Slang::Codegen.new(catalog: catalog)
+  Slang::Parser.new(slang).parse.accept(cg)
+  cg.to_s
+end
+
 describe Slang do
   it "renders a basic document" do
     res = render_file("spec/fixtures/basic.slang")
@@ -224,7 +240,43 @@ describe Slang do
     end
   end
 
+  describe "comments" do
+    it "ignores invisible comments" do
+      render("/ invisible\nspan Foo").should eq "<span>Foo</span>"
+    end
+
+    it "renders single-line visible comments" do
+      render("/! a comment").should eq "<!--a comment-->"
+    end
+
+    it "renders visible comments with children" do
+      render("/!\n  span Child").should eq "<!--\n  <span>Child</span>\n-->"
+    end
+
+    it "renders conditional IE comments" do
+      render("/[if IE]\n  p Old browser").should eq "<!--[if IE]>\n  <p>Old browser</p>\n<![endif]-->"
+    end
+  end
+
+  describe "shorthand elements" do
+    it "renders div for #id shorthand" do
+      render("#my-id").should eq %(<div id="my-id"></div>)
+    end
+
+    it "renders div for .class shorthand" do
+      render(".my-class").should eq %(<div class="my-class"></div>)
+    end
+
+    it "renders div for combined #id.class shorthand" do
+      render("#my-id.my-class").should eq %(<div id="my-id" class="my-class"></div>)
+    end
+  end
+
   describe "text node" do
+    it "appends trailing space with ' prefix" do
+      render("span\n  ' hello").should eq "<span>\n  hello \n</span>"
+    end
+
     it "properly escapes double quotes" do
       res = render_file "spec/fixtures/double-quotes.slang"
 
@@ -252,8 +304,8 @@ describe Slang do
       <div>
         <svg width="256" height="448" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
           <defs>
-            <path id=\"shape1\" d=\"M184 144q0 3.25-2.375\"></path>
-            <path id=\"shape2\" d=\"M184 144q0 3.25-2.375\"></path>
+            <path id="shape1" d="M184 144q0 3.25-2.375"></path>
+            <path id="shape2" d="M184 144q0 3.25-2.375"></path>
           </defs>
         </svg>
       </div>
@@ -288,6 +340,10 @@ describe Slang do
       </script>
       HTML
     end
+    it "renders css: as a style tag" do
+      render("css:\n  h1 {color:red;}").should eq "<style>\n  h1 {color:red;}\n</style>"
+    end
+
     it "renders stylesheets" do
       res = render_file "spec/fixtures/style.slang"
       res.should eq <<-HTML
@@ -370,6 +426,138 @@ describe Slang do
         </li>
       </ul>
       HTML
+    end
+  end
+
+  describe "Windows CRLF line endings" do
+    it "renders template with CRLF endings properly" do
+      res = render "div(hello=\"world\")\r\n  span pid=Process.pid\r\n"
+      res.should eq "<div hello=\"world\">\n  <span pid=\"#{Process.pid}\"></span>\n</div>"
+    end
+  end
+
+  describe "i18n extraction" do
+    it "collects tag text together with its line number" do
+      entries = extract("div\n  p Save\n")
+      entries.map(&.msgid).should eq ["Save"]
+      entries.first.line_number.should eq 2
+    end
+
+    it "collects only the allowlisted literal attributes" do
+      entries = extract(%(input placeholder="Search" title="Find" type="text" class="foo"))
+      entries.map(&.msgid).sort!.should eq ["Find", "Search"]
+    end
+
+    it "skips text with no letters, such as separators" do
+      extract(%(span class="sep" —\np 42)).should be_empty
+    end
+
+    it "skips pre and code content" do
+      extract("pre\n  code Save\n").should be_empty
+    end
+
+    it "skips interpolated output" do
+      extract(%(p\n  = "hi \#{1}"\n)).should be_empty
+    end
+
+    it "attaches the preceding invisible comment as a translator comment" do
+      entries = extract("/ Translator: the file, not a person\np Name\n")
+      entries.first.msgid.should eq "Name"
+      entries.first.comment.should eq "Translator: the file, not a person"
+    end
+
+    it "does not leak a translator comment past the very next sibling" do
+      entries = extract("/ note\np Skip\np Name\n")
+      entries.map(&.comment).should eq ["note", nil]
+    end
+
+    it "formats entries as gettext .pot fragments" do
+      Slang.extract_strings(%(p Save), "views/demo.slang").should eq <<-POT
+      #: views/demo.slang:1
+      msgid "Save"
+      msgstr ""
+
+      POT
+    end
+  end
+
+  describe "i18n codegen" do
+    it "leaves text untouched when no catalog is given" do
+      codegen(%(p Save)).should contain("Save")
+    end
+
+    it "bakes the translated string directly into the buffer, with no runtime lookup" do
+      code = codegen(%(p Save), {"Save" => "Salvar"})
+      code.should contain("Salvar")
+      code.should_not contain("t(")
+      code.should_not contain("Save")
+    end
+
+    it "falls back to the source string when the catalog has no entry" do
+      codegen(%(p Save), {} of String => String).should contain("Save")
+    end
+
+    it "translates only allowlisted literal attributes" do
+      code = codegen(%(input placeholder="Search" class="foo"), {"Search" => "Pesquisar", "foo" => "should never be looked up"})
+      code.should contain("Pesquisar")
+      code.should_not contain("should never be looked up")
+    end
+
+    it "does not translate pre/code content even with a catalog" do
+      codegen("pre\n  code Save\n", {"Save" => "Salvar"}).should contain("Save")
+    end
+
+    it "does not translate text with no letters even with a catalog" do
+      codegen(%(span —), {"—" => "should never be looked up"}).should_not contain("should never be looked up")
+    end
+  end
+
+  describe "Po.parse" do
+    it "parses plain msgid/msgstr pairs" do
+      Slang::Po.parse(%(msgid "Save"\nmsgstr "Salvar"\n)).should eq({"Save" => "Salvar"})
+    end
+
+    it "skips the header entry (empty msgid)" do
+      Slang::Po.parse(%(msgid ""\nmsgstr "Content-Type: text/plain\\n"\n)).should be_empty
+    end
+
+    it "skips fuzzy entries" do
+      Slang::Po.parse(%(#, fuzzy\nmsgid "Save"\nmsgstr "Salvar"\n)).should be_empty
+    end
+
+    it "skips entries with an empty msgstr" do
+      Slang::Po.parse(%(msgid "Save"\nmsgstr ""\n)).should be_empty
+    end
+
+    it "joins multi-line string literals" do
+      Slang::Po.parse(%(msgid ""\n"Save"\nmsgstr ""\n"Salvar"\n)).should eq({"Save" => "Salvar"})
+    end
+
+    it "unescapes \\n and \\\" within string literals" do
+      Slang::Po.parse(%(msgid "a\\nb"\nmsgstr "c\\"d"\n)).should eq({"a\nb" => "c\"d"})
+    end
+  end
+
+  describe "i18n end-to-end (render_i18n)" do
+    it "renders the matching locale's translation" do
+      lang = "pt_BR"
+      render_i18n(%(p Save), lang).should eq "<p>Salvar</p>"
+    end
+
+    it "falls back to the source language for an unknown locale" do
+      lang = "fr"
+      render_i18n(%(p Save), lang).should eq "<p>Save</p>"
+    end
+
+    it "falls back to the source string for a fuzzy or untranslated entry" do
+      lang = "pt_BR"
+      render_i18n(%(p Cancel), lang).should eq "<p>Cancel</p>"
+      render_i18n(%(p Untranslated), lang).should eq "<p>Untranslated</p>"
+    end
+
+    it "translates allowlisted attributes too" do
+      lang = "pt_BR"
+      render_i18n(%(input placeholder="Search"), lang).should eq %(<input placeholder="Pesquisar">)
     end
   end
 end

@@ -1,17 +1,16 @@
 module Slang
   abstract class Node
-    getter :parent, :token
-    delegate :value, :column_number, :line_number, :name, :escaped, :inline, to: @token
+    getter parent : Node
+    getter children : Array(Node) = [] of Node
+    getter token : Token
+
+    delegate value, column_number, line_number, name, escaped, inline, to: @token
 
     def initialize(@parent : Node, @token : Token)
     end
 
-    def nodes # children
-      @nodes ||= [] of Node
-    end
-
-    def children?
-      nodes.size > 0
+    def children? : Bool
+      !@children.empty?
     end
 
     def allow_children_to_escape?
@@ -29,7 +28,7 @@ module Slang
         count += 1 unless current_parent.class.name.ends_with?("Control")
         current_parent = current_parent.parent
       end
-      return count
+      count
     end
 
     def indentation_spaces
@@ -44,10 +43,8 @@ module Slang
       indentation_spaces.times.map { " " }.join("")
     end
 
-    def to_s(str, buffer_name)
-      nodes.each do |node|
-        node.to_s(str, buffer_name)
-      end
+    def accept(visitor : Visitor)
+      visitor.visit(self)
     end
   end
 end

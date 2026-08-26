@@ -22,8 +22,16 @@ module Slang
         @raw_text_column = 0
       end
 
-      inline = @raw_text_column > 0 || (@last_token.type == :ELEMENT && @last_token.line_number == @line_number)
+      inline = @raw_text_column > 0 || (@last_token.type.element? && @last_token.line_number == @line_number)
 
+      inline = dispatch_token(inline)
+
+      @token.inline = inline unless @raw_text_column > 0
+      @last_token = @token
+      @token
+    end
+
+    private def dispatch_symbol_token(inline : Bool) : Bool?
       case current_char
       when '\0'
         @token.type = :EOF
@@ -32,13 +40,9 @@ module Slang
         consume_newline
       when '\n'
         consume_newline
-      when '.', '#', .ascii_letter?
-        inline ? consume_text : consume_element
-      when '-'
-        inline ? consume_text : consume_control
       when ':'
-        inline = false # don't consider this "inline" for output
         consume_inline_element
+        return false
       when '='
         consume_output
       when '|', '\''
@@ -49,16 +53,28 @@ module Slang
       when '/'
         consume_comment
       else
+        return nil
+      end
+      inline
+    end
+
+    private def dispatch_token(inline : Bool) : Bool
+      symbol_result = dispatch_symbol_token(inline)
+      return symbol_result unless symbol_result.nil?
+
+      case current_char
+      when '.', '#', .ascii_letter?
+        inline ? consume_text : consume_element
+      when '-'
+        inline ? consume_text : consume_control
+      else
         if inline
           consume_text
         else
           unexpected_char
         end
       end
-
-      @token.inline = inline unless @raw_text_column > 0
-      @last_token = @token
-      @token
+      inline
     end
 
     ATTR_OPEN_CLOSE_MAP = {
@@ -206,7 +222,7 @@ module Slang
       @token.type = :CONTROL
       next_char
       next_char if current_char == ' '
-      @token.value = consume_line(escape_double_quotes=false)
+      @token.value = consume_line(escape_double_quotes: false)
     end
 
     private def consume_output
@@ -228,7 +244,7 @@ module Slang
       end
 
       skip_whitespace
-      @token.value = consume_line(escape_double_quotes=false).strip
+      @token.value = consume_line(escape_double_quotes: false).strip
       @token.value = " #{@token.value}" if prepend_whitespace
       @token.value = "#{@token.value} " if append_whitespace
     end
@@ -237,8 +253,8 @@ module Slang
       @token.type = :TEXT
       append_whitespace = current_char == '\''
       next_char if current_char == '|' || current_char == '\''
-      skip_whitespace
-      @token.value = "\"#{consume_text_line.strip}#{append_whitespace ? " " : ""}\""
+      next_char if current_char == ' '
+      @token.value = "\"#{consume_text_line.rstrip}#{append_whitespace ? " " : ""}\""
     end
 
     private def consume_text_line
@@ -283,35 +299,62 @@ module Slang
       end
     end
 
+    private def handle_string_delimiter(open_char, close_char, escaped, level) : {Bool, Int32}
+      if (close_char == '"' || close_char == '\'') && current_char == close_char && !escaped
+        return {true, level}
+      end
+
+      if current_char == open_char && !escaped
+        level += 1
+      end
+      if current_char == close_char && !escaped
+        if level == 0
+          return {true, level}
+        end
+        level -= 1
+      end
+      {false, level}
+    end
+
+    private def handle_backslash_escaping(escaped, crystal, str) : Bool
+      if escaped
+        str << '\\' unless crystal
+        false
+      elsif current_char == '\\'
+        true
+      else
+        escaped
+      end
+    end
+
+    private def check_string_end : Bool
+      if current_char == '\r'
+        raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+        return true
+      elsif current_char == '\n' || current_char == '\0'
+        return true
+      end
+      false
+    end
+
     private def consume_string(open_char = '"', close_char = '"', escape_double_quotes = false, crystal = false)
       level = 0
       escaped = false
       maybe_string_interpolation = false
       String.build do |str|
         loop do
-          if escape_double_quotes
-            if current_char == '"'
-              str << "\\\""
-              next_char
-              next
-            end
-          else
-            if (close_char == '"' || close_char == '\'') && current_char == close_char && !escaped
+          if escape_double_quotes && current_char == '"'
+            str << "\\\""
+            next_char
+            next
+          end
+
+          unless escape_double_quotes
+            break_loop, level = handle_string_delimiter(open_char, close_char, escaped, level)
+            if break_loop
               str << current_char
               next_char
               break
-            end
-
-            if current_char == open_char && !escaped
-              level += 1
-            end
-            if current_char == close_char && !escaped
-              if level == 0
-                str << current_char
-                next_char
-                break
-              end
-              level -= 1
             end
           end
 
@@ -326,14 +369,9 @@ module Slang
             maybe_string_interpolation = true
           end
 
-          if escaped
-            escaped = false
-            str << '\\' unless crystal
-          elsif current_char == '\\'
-            escaped = true
-          end
+          escaped = handle_backslash_escaping(escaped, crystal, str)
 
-          if current_char == '\n' || current_char == '\0'
+          if check_string_end
             break
           else
             str << current_char
@@ -349,10 +387,13 @@ module Slang
       @token.value = "\"#{consume_line}\""
     end
 
-    private def consume_line(escape_double_quotes=true)
+    private def consume_line(*, escape_double_quotes = true)
       String.build do |str|
         loop do
-          if current_char == '\n' || current_char == '\0'
+          if current_char == '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
+          elsif current_char == '\n' || current_char == '\0'
             break
           else
             if escape_double_quotes && (current_char == '"' || current_char == '\\')
@@ -373,44 +414,59 @@ module Slang
       '<' => '>',
     }
 
+    private def handle_equals_in_value(str) : Bool
+      next_char
+      if current_char == '"'
+        ch = current_char
+        str << current_char
+        next_char
+        str << consume_string open_char: ch, close_char: ch
+        return true
+      end
+      false
+    end
+
+    private def handle_open_close_value_chars(open_char, close_char, open_count, str) : {Bool, Int32}
+      if current_char == open_char
+        open_count += 1
+        str << current_char
+        next_char
+      elsif current_char == close_char
+        if open_count == 0
+          return {true, open_count}
+        end
+        open_count -= 1
+        str << current_char
+        next_char
+      end
+      {false, open_count}
+    end
+
     private def consume_value(open_char, close_char)
       String.build do |str|
         open_count = 0
 
-        is_str = false
-        is_in_parenthesis = false
-        is_in_interpolation = false
         loop do
           case current_char
           when '='
-            next_char
-            if current_char == '"'
-              ch = current_char
-              str << current_char
-              next_char
-              str << consume_string open_char: ch, close_char: ch
-              break
-            end
+            break if handle_equals_in_value(str)
           when ' '
             break if open_count == 0
             str << current_char
             next_char
-          when open_char
-            next if open_char == ' '
-            open_count += 1
-            str << current_char
-            next_char
-          when close_char
-            next if close_char == ' '
-            break if open_count == 0
-            open_count -= 1
-            str << current_char
-            next_char
+          when '\r'
+            raise "slang expected '\\n' after '\\r'" unless peek_next_char == '\n'
+            break
           when '\n', '\0'
             break
           else
-            str << current_char
-            next_char
+            break_loop, open_count = handle_open_close_value_chars(open_char, close_char, open_count, str)
+            if break_loop
+              break
+            elsif current_char != open_char && current_char != close_char
+              str << current_char
+              next_char
+            end
           end
         end
       end

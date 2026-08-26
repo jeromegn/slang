@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: views/demo.slang:1
+msgid "Save"
+msgstr "Salvar"
+
+#: views/demo.slang:2
+msgid "Search"
+msgstr "Pesquisar"
+
+#, fuzzy
+#: views/demo.slang:3
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: views/demo.slang:4
+msgid "Untranslated"
+msgstr ""

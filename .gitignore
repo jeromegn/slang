@@ -2,6 +2,8 @@
 /libs/
 /.crystal/
 /.shards/
+/bin/
+/lib/
 
 /examples/.crystal
 

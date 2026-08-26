@@ -20,7 +20,7 @@ html
       #hello.world.world2
         - some_var = "hello world haha"
         span
-          span data-some-var=some_var two-attr="fun" and a #{p("hello")}
+          span data-some-var=some_var two-attr="fun" and a #{passthrough("hello")}
           span
             span.deep_nested
               p

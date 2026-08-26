@@ -1,2 +1,2 @@
 div
-  = p "hello"
+  = passthrough "hello"
